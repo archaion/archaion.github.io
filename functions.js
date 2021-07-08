@@ -17,34 +17,34 @@ bonus = (atr) => {
    if (atr - 10 < 2) return 0;
 }
 
-// Get Character object from "NPC" array based on ID property (args: engine UID)
-GetNPC = (UID) => {
-   for (var index in NPCs) {
-      if (NPCs[index].ID == UID) return NPCs[index];
+/*/ Get Character object from "NPC" array based on ID property (args: engine UID)
+GetCast = (UID) => {
+   for (var index in Cast) {
+      if (Cast[index].ID == UID) return Cast[index];
    }
-}
+}*/
 
 // Get current value of Status property for "NPC" Character object (args: engine UID) 
 GetStatus = (ID) => {
-   var My = GetNPC(ID);                            // Engine JS: GetStatus(x) -> value = "state" -> set State
-   return My.Status[My.Status.length - 1];
+   var My = Cast[ID];                        // Engine JS: GetStatus(x) -> value = "state" -> set State
+   return My.Status;
 }
 
 // Get value of property in "NPC" Character object (args: engine UID, "property name") 
 GetValue = (ID, property) => {
-   var My = GetNPC(ID);
-   return My[property];                            // Eg. GetValue(x, HP) -> value == 0 -> State = "dead"
+   var My = Cast[ID];
+   return My[property];                         // Eg. GetValue(x, HP) -> value == 0 -> State = "dead"
 }
 
 // Get value of item property in "NPC" Character object (args: engine UID, "item name") 
 GetItem = (ID, item) => {
-   var My = GetNPC(ID);
+   var My = Cast[ID];
    return My.Items[item];
 }
 
 // Set direction Character faces by pressing arrow keys (args: Character, "direction")
 Turn = (ID, angle) => {
-   var My = GetNPC(ID);
+   var My = Cast[ID];
 
    switch (angle) {                            // MOVEMENT AND ORIENTATION         SPRITE DISPLAY
       case "D": return My.Angle = 360;         // Down = Y++                       front view sprite
@@ -60,7 +60,7 @@ Turn = (ID, angle) => {
 
 // Equip item from inventory by selecting "Equip" in menu (args: Character, "item name")
 Equip = (ID, item) => {
-   var My = GetNPC(ID),
+   var My = Cast[ID],
       equipment = My.Items[item];
 
    switch (equipment.Type) {
@@ -74,58 +74,62 @@ Equip = (ID, item) => {
 
 // Roll attack and damage by pressing "attack" near target (args: self, Character, LoS)
 Attack = (ID1, ID2) => {
-   var My = GetNPC(ID1), Your = GetNPC(ID2);
+   var My = Cast[ID1], Your = Cast[ID2], result;
+   //MyStatus = My.Status, YourStatus = Your.Status;
 
-   hit = () => {
-      Your.HP -= (My.DMG + roll(My.Weapon.DMG)) - bonus(Your.STM);
-      Your.HP > 0 ? Your.Status.push("hurt") : Your.Status.push("die");
+   if (My.Weapon.Type == "sword" || My.Weapon.Type == "empty") {
+      //My.Status = "attack";
+      if (roll(10) + My.ATK() + My.Weapon.ATK() > roll(10) + Your.DEF() + Your.Armor.DEF()) {     // Hitbox collision
+         result = My.DMG() + My.Weapon.DMG() - bonus(Your.STM);
+         return result > 0 ? Your.HP -= result : "miss";
+      } return "miss";
+   } 
+   
+   if (My.Weapon.Type == "gun") {
+      //My.Status = "attack";
+      if (roll(10) + My.ATK() + My.Weapon.ATK() > roll(10) + Your.EVD + Your.Armor.EVD()) {     // LoS collision
+         result = My.DMG() + My.Weapon.DMG() - bonus(Your.STM);
+         return result > 0 ? Your.HP -= result : "miss";
+      } return "miss";
    }
 
-   if (My.Weapon.Type == "sword") {
-      My.Status.push("attack");
-      if (My.ATK + roll(My.Weapon.ATK) > Your.DEF + roll(Your.Armor.DEF)) hit();       // Hitbox collision
-   } else if (My.Weapon.Type == "gun") {
-      My.Status.push("attack");
-      if ((My.ATK + roll(My.Weapon.ATK) > Your.EVD + roll(Your.Armor.EVD))) hit();     // LoS collision
-   } else if (My.Weapon.Type == "deck") {
-      My.Status.push("hack");
-      if ((My.HAX + roll(My.Deck.HAX) > Your.SEC + roll(Your.Deck.SEC))) {
-         Your.SP -= (My.CPU + roll(My.Deck.CPU)) - bonus(Your.INT);
-         Your.SP > 0 ? Your.Status.push("short") : Your.Status.push("die");
-      }
+   if (My.Weapon.Type == "deck") {
+      //My.Status = "hack";
+      if (roll(10) + My.HAX() + My.Deck.HAX() > roll(10) + Your.SEC() + Your.Deck.SEC()) {
+         result = My.CPU() + My.Weapon.CPU() - bonus(Your.INT);
+         return result > 0 ? Your.SP -= result : "miss";
+      } return "miss";
    }
-   My.Status.pop();
-   Your.Status.pop();
 }
 
 // Roll to avoid detection by holding "sneak" near targets (args: self, Character, line-of-sight)
 Sneak = (ID1, ID2, sight) => {
-   var My = GetNPC(ID1), Your = GetNPC(ID2);
-   My.Status.push("sneak");
+   var My = Cast[ID1], Your = Cast[ID2];
+   //My.Status = "sneak";
 
-   if (sight) {                                                // Only NPCs with LoS to Character (engine)
-      var check = My.Stealth + roll(10),                       // Roll check
-         target = Your.Alertness + roll(10),
+   if (sight) {                                            // Only NPCs with LoS to Character (engine)
+      var check = My.Stealth() + roll(10),                   // Roll check
+         target = Your.Alertness() + roll(10),
          distance = (Math.abs(My.Y_pos - Your.Y_pos) + Math.abs(My.X_pos - Your.X_pos));
 
-      if (check < target + 100 - distance) {                   // Success - Character is unnoticed
-         if (Your.Mood < 0) Your.Status.push("approach");      // Failure - NPC may becomes hostile
+      if (check < target + 100 - distance) {               // Success - Character is unnoticed
+         if (Your.Mood < 0);//Your.Status = "approach";      // Failure - NPC may becomes hostile
       }
    }
 }
 
 // Roll dialogue skill checks by selecting options in dialogue menu (args: self, Character, "skill name")
 Talk = (ID1, ID2, skill) => {
-   var My = GetNPC(ID1), Your = GetNPC(ID2),
+   var My = Cast[ID1], Your = Cast[ID2],
       mine, yours, check, target;
-   My.Status.push("talk");
-   Your.Status.push("talk");
+   //My.Status = "talk";
+   //Your.Status = "talk";
 
    switch (skill) {
-      case "Finance": (mine = My.Finance, yours = Your.Streetwise); break;             // On buying or selling (prices)
-      case "Intimidate": (mine = My.Intimidate, yours = Your.Etiquette); break;
-      case "Politics": (mine = My.Politics, yours = Your.Intuition); break;
-      case "Investigate": (mine = My.Investigate, yours = Your.Subterfuge); break;     // On use of NPC decks (access)
+      case "Finance": (mine = My.Finance(), yours = Your.Streetwise()); break;             // On buying or selling (prices)
+      case "Intimidate": (mine = My.Intimidate(), yours = Your.Etiquette()); break;
+      case "Politics": (mine = My.Politics(), yours = Your.Intuition()); break;
+      case "Investigate": (mine = My.Investigate(), yours = Your.Subterfuge()); break;     // On use of NPC decks (access)
    }
 
    check = mine + roll(10);                                                            // Roll skill checks
@@ -145,8 +149,9 @@ Talk = (ID1, ID2, skill) => {
 
 // Add or remove items in Character inventory (args: engine UID, object, "add" OR "remove")
 Trade = (ID, item, number, trade) => {
-   var My = GetNPC(ID), name = item.Name;          // If called from Talk(), ID = Your.ID
-   My.Status.push("trade");
+   var My = Cast[ID], name = item.Name;          // If called from Talk(), ID = Your.ID
+   //MyStatus = My.Status;
+   //My.Status = "trade";
 
    if (trade == "add") {
       return My.Items[name] ? My.Items[name].Amount += number :
@@ -155,20 +160,21 @@ Trade = (ID, item, number, trade) => {
       return My.Items[name].Amount > number ? My.Items[name].Amount -= number :
          delete My.Items[name];
    }
-   My.Status.pop();
+   //My.Status = MyStatus;
 }
 
 // Roll craft check to combine items by pressing "craft" at workbench (args: self, "item name", "item name")
 Craft = (ID, itemA, itemB) => {
-   var My = GetNPC(ID),
+   var My = Cast[ID],
       item1 = My.Items[itemA], item2 = My.Items[itemB],
-      check = My.Crafts + roll(10),                               // Roll check
-      target = My.Crafts + roll(20) - My.Research;
-   My.Status.push("craft");
+      check = My.Crafts() + roll(10),                               // Roll check
+      target = My.Crafts() + roll(20) - My.Research();
+   //MyStatus = My.Status;
+   //My.Status = "craft";
 
    switch (itemA, itemB) {                                        // Items must be in correct order
       case ("Hydrocell", "Antenna"):
-         My.Status.pop();
+         //My.Status = MyStatus;
          item1.Amount == 1 ? delete item1 : item1.Amount -= 1;    // Remove items used
          item2.Amount == 1 ? delete item2 : item2.Amount -= 1;
          if (check > target) {                                    // Success: create superior item
@@ -195,7 +201,7 @@ Craft = (ID, itemA, itemB) => {
                };
          };
       case ("Opium", "Bleach"):
-         My.Status.pop();
+         //My.Status = MyStatus;
          item1.Amount == 1 ? delete item1 : item1.Amount -= 1;
          item2.Amount == 1 ? delete item2 : item2.Amount -= 1;
          if (check > target) {
@@ -222,7 +228,7 @@ Craft = (ID, itemA, itemB) => {
                };
          };
       case ("Vitae", "Soma"):
-         My.Status.pop();
+         //My.Status = MyStatus;
          item1.Amount == 1 ? delete item1 : item1.Amount -= 1;
          item2.Amount == 1 ? delete item2 : item2.Amount -= 1;
          if (check > target) {
@@ -248,20 +254,21 @@ Craft = (ID, itemA, itemB) => {
                   Icon: "Fetch_Half_icon.png"
                };
          }
-      default: My.Status.pop();                   // Items not compatible (add visual effect)
+      //default: My.Status = MyStatus;                   // Items not compatible (add visual effect)
    }
 }
 
 // Roll to use healing item by pressing hotkey OR "select" in menu (args: self, Character OR self, "item name")
 Heal = (ID1, ID2, itm) => {
-   var My = GetNPC(ID1), Your = GetNPC(ID2), item = My.Items[itm],
+   var My = Cast[ID1], Your = Cast[ID2], item = My.Items[itm],
       mine, yours, check, target, effect;
-   My.Status.push("heal");
+   //MyStatus = My.Status;
+   //My.Status = "heal";
 
    switch (item.Type) {
-      case "parts": (mine = My.Repair, yours = Your.Technology); break;    // Use "Charger" item
-      case "meds": (mine = My.Medicine, yours = Your.Science); break;      // Use "Morphine" item
-      case "drugs": (mine = My.Occult, yours = Your.Survival); break;      // Use "Fetch" item
+      case "parts": (mine = My.Repair(), yours = Your.Technology()); break;    // Use "Charger" item
+      case "meds": (mine = My.Medicine(), yours = Your.Science()); break;      // Use "Morphine" item
+      case "drugs": (mine = My.Occult(), yours = Your.Survival()); break;      // Use "Fetch" item
    }
 
    check = mine + roll(10);                                                // Roll check
@@ -269,11 +276,11 @@ Heal = (ID1, ID2, itm) => {
    effect = item.Effect + check - target;
 
    item.Amount == 1 ? delete item : item.Amount -= 1;                      // Remove item used
-   My.Status.pop();
+   //My.Status = MyStatus;
 
    if (check > target) {                                                   // Success: limited stat increase
       switch (item.Type) {
-         case "parts": return Your.SP < Your.SP_max() - effect ?
+         case "parts": return Your.SP < Your.SP_max() - effect ?             
             Your.SP += effect : Your.SP = Your.SP_max();
          case "meds": return Your.HP < Your.HP_max() - effect ?
             Your.HP += effect : Your.HP = Your.HP_max();
@@ -291,18 +298,20 @@ Heal = (ID1, ID2, itm) => {
 
 // Restore vital stats to maximum by selecting "rest" from menu (args: self)
 Rest = (ID) => {
-   var My = GetNPC(ID);
+   var My = Cast[ID];
+   //MyStatus = My.Status;
    if (GetStatus(ID) == "idle") {       // Not in dialogue or combat (check distance to NPCs)
-      My.Status.push("rest");
-      setTimeout(() => (My.HP = My.HP_max(), My.SP = My.SP_max(), My.MP = My.MP_max(), My.status.pop()), 5000);
+      //My.Status.push("rest");
+      setTimeout(() => (My.HP = My.HP_max(), My.SP = My.SP_max(), My.MP = My.MP_max()), 5000); //My.Status = MyStatus
    }
 }
 
 // Use class ability by pressing "ability" near target (args: self, Character, "ability name")
 Ability = (ID1, ID2, ability) => {
-   var My = GetNPC(ID1), Your = GetNPC(ID2),
+   var My = Cast[ID1], Your = Cast[ID2],
       mine, yours, check, target, mine_org, yours_org;
-      My.Status.push("ability");
+   //MyStatus = My.Status;
+   //My.Status.push("ability");
 
    switch (ability) {
       case "Vengeance": (mine = My.STR, yours = Your.DEX); break;
@@ -329,12 +338,12 @@ Ability = (ID1, ID2, ability) => {
       yours -= check - target;
       setTimeout(() => (mine = mine_org, yours = yours_org), 30000);
    }
-   My.Status.pop();
+   //My.Status = MyStatus;
 }
 
 // Change current Status by meeting event condition (args: mine, "new status")
 Transfer = (ID, event) => {   // Check Status and set FSM to corresponding state on update (engine) 
-   var My = GetNPC(ID);
+   var My = Cast[ID];
    switch (GetStatus(ID)) {
 
       // PLAYER STATES
@@ -524,16 +533,16 @@ State = (My, status) => {
 
 
 /* LINE OF SIGHT
-       if (Math.abs(this.X - that.Y) + Math.abs(that.X - this.Y) <= 100) {                        // In range
+       if (Math.abs(this.X - that.Y) + Math.abs(that.X - this.Y) <= 100) {          // In range
           switch (this.Faces) {
-             case 45: if (this.X > that.X && this.Y < that.Y) hit(); break;                         // Facing target
-             case 90: if (this.X > that.X) hit(); break;
-             case 135: if (this.X > that.X && this.Y > that.Y) hit(); break;
-             case 180: if (this.Y > that.Y) hit(); break;
-             case 225: if (this.X < that.X && this.Y > that.Y) hit(); break;
-             case 270: if (this.X < that.X) hit(); break;
-             case 315: if (this.X < that.X && this.Y < that.Y) hit(); break;
-             case 360: if (this.Y < that.Y) hit(); break;
+             case 0: if (this.X > that.X) hit(); break;                             // walk L, set angle 0
+             case 45: if (this.X > that.X && this.Y > that.Y) hit(); break;         // walk LD, set angle 45
+             case 90: if (this.Y > that.Y) hit(); break;
+             case 135: if (this.X < that.X && this.Y > that.Y) hit(); break;
+             case 180: if (this.X < that.X) hit(); break;                           // additional check required
+             case 225: if (this.X < that.X && this.Y < that.Y) hit(); break;
+             case 270: if (this.Y < that.Y) hit(); break;
+             case 315: if (this.X > that.X && this.Y < that.Y) hit(); break;
           }
        }
 */
