@@ -18,8 +18,8 @@ function Character(id, nam, rac, cls, lvl, itm) {
    this.Mood = 0;
 
    // Engine (read only)
-   this.Angle = 360;       // Degrees clockwise from bottom (engine)
-   this.Y_pos = 0;
+   this.Angle = 0;         // Degrees clockwise from right (engine)
+   this.Y_pos = 0;         // Position in layout (engine)
    this.X_pos = 0;
 
    //------------------------------------ Inventory ---------------------------------
@@ -53,147 +53,249 @@ function Character(id, nam, rac, cls, lvl, itm) {
    this.Chip = this.Items.Empty;
 
    //------------------------------------ Attributes ---------------------------------
-   // Racial starting bonuses
-   STR_rac = () => rac == "African" ? 2 : rac == "European" ? 0 : -1;
-   DEX_rac = () => rac == "Asian" ? 2 : 0;
-   STM_rac = () => rac == "European" ? 2 : 0;
-   INT_rac = () => rac == "Asian" ? 2 : rac == "European" ? 1 : -1;
-   WIT_rac = () => rac == "African" ? 2 : 0;
-   CHA_rac = () => rac == "European" ? 1 : 0;
-   WIL_rac = () => rac == "African" ? 2 : 0;
-   INS_rac = () => rac == "European" ? 2 : 0;
-   HUM_rac = () => rac == "Asian" ? 2 : 0;
+   // Physical
+   this.STR = 10 + roll(4) + (this.Race == "African" ? 2 : (this.Race == "European" ? 0 : -1));
+   this.DEX = 10 + roll(4) + (this.Race == "Asian" ? 2 : 0);
+   this.STM = 10 + roll(4) + (this.Race == "European" ? 2 : 0);
 
-   // Totals
-   this.STR = 10 + STR_rac() + roll(4);      // Physical
-   this.DEX = 10 + DEX_rac() + roll(4);
-   this.STM = 10 + STM_rac() + roll(4);
+   // Mental
+   this.INT = 10 + roll(4) + (this.Race == "Asian" ? 2 : (this.Race == "European" ? 1 : -1));
+   this.WIT = 10 + roll(4) + (this.Race == "African" ? 2 : 0);
+   this.CHA = 10 + roll(4) + (this.Race == "European" ? 1 : 0);
 
-   this.INT = 10 + INT_rac() + roll(4);      // Mental
-   this.WIT = 10 + WIT_rac() + roll(4);
-   this.CHA = 10 + CHA_rac() + roll(4);
+   // Spiritual
+   this.WIL = 10 + roll(4) + (this.Race == "African" ? 2 : 0);
+   this.INS = 10 + roll(4) + (this.Race == "European" ? 2 : 0);
+   this.HUM = 10 + roll(4) + (this.Race == "Asian" ? 2 : 0);
 
-   this.WIL = 10 + WIL_rac() + roll(4);      // Spiritual
-   this.INS = 10 + INS_rac() + roll(4);
-   this.HUM = 10 + HUM_rac() + roll(4);
-
-   //------------------------------------ Skills ---------------------------------
-   // Class starting bonuses
-   Firearms_cls = cls == "Soldier" ? 3 : (cls == "Guard" ? 1 : 0);     // Combat spec
-   Athletics_cls = cls == "Soldier" ? 2 : (cls == "Guard" ? 1 : 0);
-   Melee_cls = cls == "Guard" ? 3 : (cls == "Soldier" ? 1 : 0);
-   Dodge_cls = cls == "Guard" ? 2 : (cls == "Soldier" ? 1 : 0);
-
-   Computer_cls = cls == "Hacker" ? 3 : (cls == "Thief" ? 1 : 0);      // Operations spec
-   Alertness_cls = cls == "Hacker" ? 2 : (cls == "Thief" ? 1 : 0);
-   Stealth_cls = cls == "Thief" ? 3 : (cls == "Hacker" ? 1 : 0);
-   Security_cls = cls == "Thief" ? 2 : (cls == "Hacker" ? 1 : 0);
-
-   Repair_cls = cls == "Tech" ? 3 : (cls == "Medic" ? 1 : 0);          // Support spec
-   Technology_cls = cls == "Tech" ? 2 : (cls == "Medic" ? 1 : 0);
-   Medicine_cls = cls == "Medic" ? 3 : (cls == "Tech" ? 1 : 0);
-   Survival_cls = cls = "Medic" ? 2 : (cls == "Tech" ? 1 : 0);
-
-   Occult_cls = cls == "Scholar" ? 3 : (cls == "Artisan" ? 1 : 0);     // Unknown spec
-   Research_cls = cls == "Scholar" ? 2 : (cls == "Artisan" ? 1 : 0);
-   Crafts_cls = cls == "Artisan" ? 3 : (cls == "Scholar" ? 1 : 0);
-   Science_cls = cls == "Artisan" ? 2 : (cls == "Scholar" ? 1 : 0);
-
-   Finance_cls = cls == "Trader" ? 3 : (cls == "Dealer" ? 1 : 0);      // Business spec
-   Etiquette_cls = cls == "Trader" ? 2 : (cls == "Dealer" ? 1 : 0);
-   Intimidate_cls = cls == "Dealer" ? 3 : (cls == "Trader" ? 1 : 0);
-   Streetwise_cls = cls == "Dealer" ? 2 : (cls == "Trader" ? 1 : 0);
-
-   Politics_cls = cls == "Agent" ? 3 : (cls == "Officer" ? 1 : 0);     // Diplomacy spec
-   Subterfuge_cls = cls == "Agent" ? 2 : (cls == "Officer" ? 1 : 0);
-   Investigate_cls = cls == "Officer" ? 3 : (cls == "Agent" ? 1 : 0);
-   Intuition_cls = cls == "Officer" ? 2 : (cls == "Agent" ? 1 : 0);
-
-   // Totals
-   this.Firearms = () => 10 + Firearms_cls + chip(this, "Firearms") + bonus(this.STR);        // Combat
-   this.Athletics = () => 10 + Athletics_cls + chip(this, "Athletics") + bonus(this.WIL);
-   this.Melee = () => 10 + Melee_cls + chip(this, "Melee") + bonus(this.STR);
-   this.Dodge = () => 10 + Dodge_cls + chip(this, "Dodge") + bonus(this.WIL);
-
-   this.Computer = () => 10 + Computer_cls + chip(this, "Computer") + bonus(this.DEX);        // Operations
-   this.Alertness = () => 10 + Alertness_cls + chip(this, "Alertness") + bonus(this.WIL);
-   this.Stealth = () => 10 + Stealth_cls + chip(this, "Stealth") + bonus(this.DEX);
-   this.Security = () => 10 + Security_cls + chip(this, "Security") + bonus(this.WIL);
-
-   this.Repair = () => 10 + Repair_cls + chip(this, "Repair") + bonus(this.STM);              // Support
-   this.Technology = () => 10 + Technology_cls + chip(this, "Technology") + bonus(this.INS);
-   this.Medicine = () => 10 + Medicine_cls + chip(this, "Medicine") + bonus(this.STM);
-   this.Survival = () => 10 + Survival_cls + chip(this, "Survival") + bonus(this.INS);
-
-   this.Crafts = () => 10 + Crafts_cls + chip(this, "Crafts") + bonus(this.WIT);              // Unknown
-   this.Research = () => 10 + Research_cls + chip(this, "Research") + bonus(this.INS);
-   this.Occult = () => 10 + Occult_cls + chip(this, "Occult") + bonus(this.WIT);
-   this.Science = () => 10 + Science_cls + chip(this, "Science") + bonus(this.INS);
-
-   this.Finance = () => 10 + Finance_cls + chip(this, "Finance") + bonus(this.INT);           // Business
-   this.Streetwise = () => 10 + Streetwise_cls + chip(this, "Streetwise") + bonus(this.HUM);
-   this.Intimidate = () => 10 + Intimidate_cls + chip(this, "Intimidate") + bonus(this.INT);
-   this.Etiquette = () => 10 + Etiquette_cls + chip(this, "Etiquette") + bonus(this.HUM);
-
-   this.Politics = () => 10 + Politics_cls + chip(this, "Politics") + bonus(this.CHA);        // Diplomacy
-   this.Intuition = () => 10 + Intuition_cls + chip(this, "Intuition") + bonus(this.HUM);
-   this.Investigate = () => 10 + Investigate_cls + chip(this, "Investigate") + bonus(this.CHA);
-   this.Subterfuge = () => 10 + Subterfuge_cls + chip(this, "Subterfuge") + bonus(this.HUM);
-
-   //------------------------------------ Stats ---------------------------------
-   // Vitals   
+   //------------------------------------ Vital Stats ---------------------------------
+   // Base values   
    this.HP_min = roll(10) + roll(10) + roll(10);
    this.SP_min = roll(10) + roll(10) + roll(10);
    this.MP_min = roll(10) + roll(10) + roll(10);
 
-   this.HP_max = () => this.HP_min + this.Level + bonus(this.STM);
-   this.SP_max = () => this.HP_min + this.Level + bonus(this.INT);
-   this.MP_max = () => this.HP_min + this.Level + bonus(this.WIL);
-
-   this.HP = this.HP_max();         // Current values
+   // Current values
+   this.HP = this.HP_max();
    this.SP = this.SP_max();
    this.MP = this.MP_max();
 
-   // Combat stats
-   this.ATK = () => {
-      switch (this.Weapon.Type) {
-         case "sword": return this.Melee() + bonus(this.INS);
-         case "gun": return this.Firearms() + bonus(this.INS);
-         default: return this.Survival();
-      }
-   };
-   this.DMG = () => {                // Add secondary attribute bonus if weapon / armor equipped
-      switch (this.Weapon.Type) {
-         case "sword": return bonus(this.STR);
-         case "gun": return bonus(this.DEX);
-         default: return bonus(this.INS);
-      }
-   };
-   this.DEF = () => this.Armor.Type == "armor" ? this.Athletics() + bonus(this.STM) : this.Athletics();
-   this.EVD = () => this.Armor.Type == "armor" ? this.Dodge() + bonus(this.STM) : this.Dodge();
-   this.HAX = () => this.Deck.Type == "deck" ? this.Computer() + bonus(this.WIT) : this.Computer();
-   this.CPU = () => this.Deck.Type == "deck" ? this.Technology() + bonus(this.INT) : this.Technology();
-   this.SEC = () => this.Deck.Type == "deck" ? this.Security() + bonus(this.INT) : this.Security();
-
    //------------------------------------ Abilities ---------------------------------
-   // Class starting ability 
-   Abilities_cls = () => {
-      switch (this.Class) {
-         case "Soldier": return "Vengeance";
-         case "Guard": return "Defense";
-         case "Hacker": return "Celerity";
-         case "Thief": return "Obfuscate";
-         case "Tech": return "Redemption";
-         case "Medic": return "Martyrdom";
-         case "Scholar": return "Visionary";
-         case "Artisan": return "Innocence";
-         case "Trader": return "Auspex";
-         case "Dealer": return "Dominate";
-         case "Agent": return "Presence";
-         case "Officer": return "Judgement";
-      }
-   }
    // Current ability
-   this.Abilities = Abilities_cls();
+   this.Abilities = this.Abilities_cls();
 }
 
+
+//////////////////////////////////////// PROTOTYPE FUNCTIONS ////////////////////////////////////////
+
+// Vital stats
+Character.prototype.HP_max = function() { return this.HP_min + this.Level + bonus(this.STM)};
+Character.prototype.SP_max = function() { return this.HP_min + this.Level + bonus(this.INT)};
+Character.prototype.MP_max = function() { return this.HP_min + this.Level + bonus(this.WIL)};
+
+// Combat stats
+Character.prototype.ATK = function () {
+   switch (this.Weapon.Type) {
+      case "sword": return this.Melee() + bonus(this.INS);
+      case "gun": return this.Firearms() + bonus(this.INS);
+      default: return this.Survival();
+   }
+};
+Character.prototype.DMG = function () {                 // Add secondary attribute bonus if weapon / armor equipped
+   switch (this.Weapon.Type) {
+      case "sword": return bonus(this.STR);
+      case "gun": return bonus(this.DEX);
+      default: return bonus(this.INS);
+   }
+};
+Character.prototype.DEF = function () {
+   return this.Armor.Type == "armor" ? this.Athletics() + bonus(this.STM) : this.Athletics();
+};
+Character.prototype.EVD = function () {
+   return this.Armor.Type == "armor" ? this.Dodge() + bonus(this.STM) : this.Dodge();
+};
+Character.prototype.HAX = function () {
+   return this.Deck.Type == "deck" ? this.Computer() + bonus(this.WIT) : this.Computer();
+};
+Character.prototype.CPU = function () {
+   return this.Deck.Type == "deck" ? this.Technology() + bonus(this.INT) : this.Technology();
+};
+Character.prototype.SEC = function () {
+   return this.Deck.Type == "deck" ? this.Security() + bonus(this.INT) : this.Security();
+};
+
+//------------------------------------ Skills
+// Combat spec
+Character.prototype.Firearms = function () {
+   return 10 + chip(this, "Firearms") + bonus(this.STR) +
+      (this.Class == "Soldier" ? 3 : (this.Class == "Guard" ? 1 : 0));
+};
+Character.prototype.Athletics = function () {
+   return 10 + chip(this, "Athletics") + bonus(this.WIL) +
+      (this.Class == "Soldier" ? 2 : (this.Class == "Guard" ? 1 : 0));
+};
+Character.prototype.Melee = function () {
+   return 10 + chip(this, "Melee") + bonus(this.STR) +
+      (this.Class == "Guard" ? 3 : (this.Class == "Soldier" ? 1 : 0));
+};
+Character.prototype.Dodge = function () {
+   return 10 + chip(this, "Dodge") + bonus(this.WIL) +
+      (this.Class == "Guard" ? 2 : (this.Class == "Soldier" ? 1 : 0));
+};
+
+// Operations spec
+Character.prototype.Computer = function () {
+   return 10 + chip(this, "Computer") + bonus(this.DEX) +
+      (this.Class == "Hacker" ? 3 : (this.Class == "Thief" ? 1 : 0));
+};
+Character.prototype.Alertness = function () {
+   return 10 + chip(this, "Alertness") + bonus(this.WIL) +
+      (this.Class == "Hacker" ? 2 : (this.Class == "Thief" ? 1 : 0));
+};
+Character.prototype.Stealth = function () {
+   return 10 + chip(this, "Stealth") + bonus(this.DEX) +
+      (this.Class == "Thief" ? 3 : (this.Class == "Hacker" ? 1 : 0));
+};
+Character.prototype.Security = function () {
+   return 10 + chip(this, "Security") + bonus(this.WIL) +
+      (this.Class == "Thief" ? 2 : (this.Class == "Hacker" ? 1 : 0));
+};
+
+// Support spec
+Character.prototype.Repair = function () {
+   return 10 + chip(this, "Repair") + bonus(this.STM) +
+      (this.Class == "Tech" ? 3 : (this.Class == "Medic" ? 1 : 0));
+};
+Character.prototype.Technology = function () {
+   return 10 + chip(this, "Technology") + bonus(this.INS) +
+      (this.Class == "Tech" ? 2 : (this.Class == "Medic" ? 1 : 0));
+};
+Character.prototype.Medicine = function () {
+   return 10 + chip(this, "Medicine") + bonus(this.STM) +
+      (this.Class == "Medic" ? 3 : (this.Class == "Tech" ? 1 : 0));
+};
+Character.prototype.Survival = function () {
+   return 10 + chip(this, "Survival") + bonus(this.INS) +
+      (this.Class == "Medic" ? 2 : (this.Class == "Tech" ? 1 : 0));
+};
+
+// Unknown spec
+Character.prototype.Occult = function () {
+   return 10 + chip(this, "Occult") + bonus(this.WIT) +
+      (this.Class == "Scholar" ? 3 : (this.Class == "Artisan" ? 1 : 0));
+};
+Character.prototype.Research = function () {
+   return 10 + chip(this, "Research") + bonus(this.INS) +
+      (this.Class == "Scholar" ? 2 : (this.Class == "Artisan" ? 1 : 0));
+};
+Character.prototype.Crafts = function () {
+   return 10 + chip(this, "Crafts") + bonus(this.WIT) +
+      (this.Class == "Artisan" ? 3 : (this.Class == "Scholar" ? 1 : 0));
+};
+Character.prototype.Science = function () {
+   return 10 + chip(this, "Science") + bonus(this.INS) +
+      (this.Class == "Artisan" ? 2 : (this.Class == "Scholar" ? 1 : 0));
+};
+
+// Business spec
+Character.prototype.Finance = function () {
+   return 10 + chip(this, "Finance") + bonus(this.INT) +
+      (this.Class == "Trader" ? 3 : (this.Class == "Dealer" ? 1 : 0));
+};
+Character.prototype.Etiquette = function () {
+   return 10 + chip(this, "Etiquette") + bonus(this.HUM) +
+      (this.Class == "Trader" ? 2 : (this.Class == "Dealer" ? 1 : 0));
+};
+Character.prototype.Intimidate = function () {
+   return 10 + chip(this, "Intimidate") + bonus(this.INT) +
+      (this.Class == "Dealer" ? 3 : (this.Class == "Trader" ? 1 : 0));
+};
+Character.prototype.Streetwise = function () {
+   return 10 + chip(this, "Streetwise") + bonus(this.HUM) +
+      (this.Class == "Dealer" ? 2 : (this.Class == "Trader" ? 1 : 0));
+};
+
+// Diplomacy spec
+Character.prototype.Politics = function () {
+   return 10 + chip(this, "Politics") + bonus(this.CHA) +
+      (this.Class == "Agent" ? 3 : (this.Class == "Officer" ? 1 : 0));
+};
+Character.prototype.Subterfuge = function () {
+   return 10 + chip(this, "Subterfuge") + bonus(this.HUM) +
+      (this.Class == "Agent" ? 2 : (this.Class == "Officer" ? 1 : 0));
+};
+Character.prototype.Investigate = function () {
+   return 10 + chip(this, "Investigate") + bonus(this.CHA) +
+      (this.Class == "Officer" ? 3 : (this.Class == "Agent" ? 1 : 0));
+};
+Character.prototype.Intuition = function () {
+   return 10 + chip(this, "Intuition") + bonus(this.HUM) +
+      (this.Class == "Officer" ? 2 : (this.Class == "Agent" ? 1 : 0));
+};
+
+// Abilities
+Character.prototype.Abilities_cls = function () {
+   switch (this.Class) {
+      case "Soldier": return "Vengeance";
+      case "Guard": return "Defense";
+      case "Hacker": return "Celerity";
+      case "Thief": return "Obfuscate";
+      case "Tech": return "Redemption";
+      case "Medic": return "Martyrdom";
+      case "Scholar": return "Visionary";
+      case "Artisan": return "Innocence";
+      case "Trader": return "Auspex";
+      case "Dealer": return "Dominate";
+      case "Agent": return "Presence";
+      case "Officer": return "Judgement";
+   }
+}
+
+
+
+
+/*
+Skill = (My, skill) => {
+   var perk;
+      switch (skill) {
+         case "Firearms": My.Class == "Soldier" ? perk = 3 : (My.Class == "Guard" ? perk = 1 : perk = 0);
+         case "Athletics": My.Class == "Soldier" ? perk = 2 : (My.Class == "Guard" ? perk = 1 : perk = 0);
+         case "Melee": My.Class == "Guard" ? perk = 3 : (My.Class == "Soldier" ? perk = 1 : perk = 0);
+         case "Dodge": My.Class == "Guard" ? perk = 2 : (My.Class == "Soldier" ? perk = 1 : perk = 0);
+         case "Computer": My.Class == "Hacker" ? perk = 3 : (My.Class == "Thief" ? perk = 1 : perk = 0);
+         case "Alertness": My.Class == "Hacker" ? perk = 2 : (My.Class == "Thief" ? perk = 1 : perk = 0);
+         case "Stealth": My.Class == "Thief" ? perk = 3 : (My.Class == "Hacker" ? perk = 1 : perk = 0);
+         case "Security": My.Class == "Thief" ? perk = 2 : (My.Class == "Hacker" ? perk = 1 : perk = 0);
+         case "Repair": 
+         case "Technology": perk =
+         case "Medicine": perk =
+         case "Survival": perk =
+         case "Crafts": perk =
+         case "Research": perk =
+         case "Occult": perk =
+         case "Science": perk =
+         case "Finance": perk =
+         case "Streetwise": perk =
+         case "Intimidate": perk =
+         case "Etiquette": perk =
+         case "Politics": perk =
+         case "Intuition": perk =
+         case "Investigate": perk =
+         case "Subterfuge": perk =
+      }
+      return My[skill] = 10 + perk() + chip(My, skill) + bonus(My[stat])
+   };
+
+
+
+   // Racial starting bonuses
+   STR_rac = rac == "African" ? 2 : rac == "European" ? 0 : -1;
+   DEX_rac = rac == "Asian" ? 2 : 0;
+   STM_rac = rac == "European" ? 2 : 0;
+   INT_rac = rac == "Asian" ? 2 : rac == "European" ? 1 : -1;
+   WIT_rac = rac == "African" ? 2 : 0;
+   CHA_rac = rac == "European" ? 1 : 0;
+   WIL_rac = rac == "African" ? 2 : 0;
+   INS_rac = rac == "European" ? 2 : 0;
+   HUM_rac = rac == "Asian" ? 2 : 0;
+
+   */

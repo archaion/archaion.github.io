@@ -1,6 +1,291 @@
 // STORE CONSTRUCTOR OUTPUT - DO NOT CALL ON STARTUP
 // EXPLICIT DECLARATION OF PLAYER FOR TESTING ONLY - store args in local engine variables for Character creation
-/*var Player = {
+
+
+//var Player = new Character(0, "Player", "European", "Guard", 1, {});
+var Player = JSON.parse('{"ID":0,"Name":"Player","Race":"European","Class":"Guard","Level":1,"EXP":0,"Status":"idle","Mood":0,"Angle":0,"Y_pos":0,"X_pos":0,"Items":{},"Weapon":{},"Armor":{},"Deck":{},"Chip":{},"STR":12,"DEX":13,"STM":16,"INT":14,"WIT":14,"CHA":14,"WIL":11,"INS":13,"HUM":13,"HP_min":13,"SP_min":18,"MP_min":13,"HP":17,"SP":16,"MP":14,"Abilities":"Defense"}');
+Player.Items.Empty = Player.Weapon = Player.Armor = Player.Chip = Player.Deck = { Name: "Empty", Type: "empty", ATK: () => roll(5), DMG: () => roll(5), EVD: () => roll(5), DEF: () => roll(5), SEC: () => roll(5), HAX: () => roll(5), CPU: () => roll(5), SKL: "Empty", BNS: 0, Effect: 0, Creds: 0, Amount: 1, Sprite: "empty", Icon: "empty" };
+Player.__proto__ = Character.prototype;
+
+var Enemy = new Character(2, "Enemy", "Asian", "Soldier", 1, {});
+
+var Cast = {
+   0: Player,
+   2: Enemy        // NPC key must match UID in engine
+};
+
+// ENGINE CANNOT HANDLE NESTED OBJECTS - SEE GetLines() FUNCTION
+var Lines = {};
+Lines = {
+   2: {                                                  // NPC engine UID
+      0: {                                               // Topic ID
+         // NPC: "Yes? What do you want?"
+         Text: "1. Who are you?",                        // User input prompts, with newline before each
+         1: "1",                                         // Key = user input, value = next topic
+      },
+      1: {
+         // NPC: "The name's Goldman. I own this place."
+         Text: "1. Do you have any work for me?",
+         1: "2",
+      },
+      2: {
+         // NPC: "As a matter of fact, I do. Get me some apples from that tree over there and I'll pay you a dollar."
+         Text: "1. Okay, I'll be right back with your apples Mr. Goldman.\n2. No, get them yourself.",
+         1: "3",
+         2: "4",
+      },
+      3: {                                               // Accept quest = set INSTANCE variable
+         // NPC: "Very good. And be quick about it, I don't have all day."
+         Text: "1. Yes, sir. (LEAVE)",
+         1: "END",
+         Quest: "A0"                                     // Set to NPCs.Topic variable - "END" topic only
+      },
+      4: {
+         // NPC: "Fine, I'll just pay someone else to do it.",
+         Text: "1. Good luck. (LEAVE)",
+         1: "END"                                        // "END" value exits "talk" state
+      },
+      // QUEST-SPECIFIC DIALOGUE:
+      A0: {
+         //NPC: "Do you have those apples I asked for?"
+         Text: "1. Yes, here you go. \n2. No, I don't have them.",
+         1: "A1",                                        // Topic = quest "A1"
+         2: "A2"
+      },
+      A1: {                                              // Reset variable and call Trade() 
+         // NPC: "Alright, hand them over then."
+         Text1: "1. (GIVE APPLES)",
+         Text2: "1. I don't have them.",
+         1: "A3",
+         2: "A2",
+         Script: function () {
+            return Player.Items.Apple ? "Text1" : "Text2";           // Display Text1 or Text2 in engine
+         }
+      },
+      A3: {
+         // NPC: "Excellent, heres your dollar. Run along now."
+         Text: "1. Thanks. (LEAVE)",
+         1: "END",
+         Quest: 0,                                       // End quest, reset dialogue
+         Script: function () {
+            Trade(0, "add", 1, "Credits");
+            Trade(0, "remove", 1, "Apple");
+            return "reward"
+         }
+      },
+      A2: {                                              // No change to instance variable
+         // NPC: "Well hurry up and get them!"
+         Text: "1. Okay. (LEAVE)",
+         1: "END",
+         Quest: "A0"                                     // Reset dialogue to quest start
+      }
+   }
+};
+
+var Props = {
+   Credits: {
+      Name: "Credits",              // Function reference and in-game display
+      Type: "money",                // Function reference
+      Amount: 1,                    // Number in inventory (default 1)
+      Sprite: "Credits.png",        // Images to display in-game (save in Construct -> Files)
+      Icon: "Credits_icon.png"
+   },
+   Katana: {
+      Name: "Katana",
+      Type: "sword",
+      ATK: 12,                      // Item stats
+      DMG: 10,
+      Creds: 500,                   // Sale / purchase value 
+      Amount: 1,
+      Sprite: "Katana.png",
+      Icon: "Katana_icon.png"
+   },
+   MP6: {
+      Name: "MP6",
+      Type: "gun",
+      ATK: 10,
+      DMG: 12,
+      Creds: 700,
+      Amount: 1,
+      Sprite: "MP6.png",
+      Icon: "MP6_icon.png"
+   },
+   Leather_Coat: {
+      Name: "Leather Coat",
+      Type: "armor",
+      EVD: 12,
+      DEF: 10,
+      Creds: 150,
+      Amount: 1,
+      Sprite: "Leather_Coat.png",
+      Icon: "Leather_Coat_icon.png"
+   },
+   SynTech_40x: {
+      Name: "SynTech 3000",
+      Type: "deck",
+      SEC: 10,
+      HAX: 10,
+      CPU: 12,
+      Creds: 1000,
+      Amount: 1,
+      Sprite: "SynTech_3000.png",
+      Icon: "SynTech_3000_icon.png"
+   },
+   NiteViz: {
+      Name: "NiteViz",
+      Type: "chip",
+      SKL: "Alertness",
+      BNS: 1,                       // On skill check, add BNS
+      Creds: 250,
+      Amount: 1,
+      Sprite: "NiteViz.png",
+      Icon: "NiteViz_icon.png"
+   },
+   //Crafting materials / consumables
+   Hydrocell: {                     // Source: merchants, NPC computers
+      Name: "Hydrocell",
+      Type: "material",             // Combines with "Antenna"
+      Amount: 1,
+      Sprite: "Hydrocell.png",      // Image: blue box
+      Icon: "Hydrocell_icon.png"
+   },
+   Antenna: {                       // Source: merchants, NPC computers
+      Name: "Antenna",
+      Type: "material",             // Combines with "Hydrocell" 
+      Amount: 1,
+      Sprite: "Antenna.png",        // Image: grey cylinder
+      Icon: "Antenna_icon.png"
+   },
+   Opium: {                         // Source: merchants, red flowers
+      Name: "Opium",
+      Type: "material",             // Combines with "Bleach"
+      Amount: 1,
+      Sprite: "Opium.png",          // Image: green pod
+      Icon: "Opium_icon.png"
+   },
+   Bleach: {                        // Source: merchants, enemy NPCs
+      Name: "Bleach",
+      Type: "material",             // Combines with "Opium"
+      Amount: 1,
+      Sprite: "Bleach.png",         // Image: brown bottle
+      Icon: "Bleach_icon.png"
+   },
+   Vitae: {                         // Combines with "Soma"
+      Name: "Vitae",
+      Type: "material",             // Source: vampires
+      Amount: 1,
+      Sprite: "Vitae.png",          // Image: red vial
+      Icon: "Vitae_icon.png"
+   },
+   Soma: {                          // Combines with "Vitae" 
+      Name: "Soma",
+      Type: "material",             // Source: insects
+      Amount: 1,
+      Sprite: "Soma.png",           // Image: yellow jar
+      Icon: "Soma_icon.png"
+   },
+   Charger_Full: {                  // Result of Craft("Hydrocell", "Antenna")
+      Name: "Charger (full)",
+      Type: "parts",                // Restores SP
+      Effect: 10,
+      Amount: 1,
+      Sprite: "Charger.png",        // Image: green box (black wires)
+      Icon: "Charger_icon.png"
+   },
+   Morphine_Full: {                 // Result of Craft("Opium", "Bleach")
+      Name: "Morphine (full)",
+      Type: "meds",                 // Restores HP
+      Effect: 10,
+      Amount: 1,
+      Sprite: "Morphine.png",       // Image: orange vial (white label)
+      Icon: "Morphine_icon.png"
+   },
+   Fetch_Full: {                    // Result of Craft("Vitae", "Soma")
+      Name: "Fetch (full)",         // Street version of the "Mead of Poetry"
+      Type: "drugs",                // Restores MP
+      Effect: 5,
+      Amount: 1,
+      Sprite: "Fetch.png",          // Image: purple jar (grey cap) 
+      Icon: "Fetch_icon.png"
+   },
+   Charger_Half: {
+      Name: "Charger (half)",
+      Type: "parts",
+      Effect: 5,
+      Amount: 1,
+      Sprite: "Charger_Half.png",
+      Icon: "Charger_icon.png"
+   },
+   Morphine_Half: {
+      Name: "Morphine (half)",
+      Type: "meds",
+      Effect: 5,
+      Amount: 1,
+      Sprite: "Morphine_Half.png",
+      Icon: "Morphine_Half_icon.png"
+   },
+   Fetch_Half: {
+      Name: "Fetch (half)",
+      Type: "drugs",
+      Effect: 5,
+      Amount: 1,
+      Sprite: "Fetch_Half.png",
+      Icon: "Fetch_Half_icon.png"
+   },
+   // Food
+   Apple: {
+      Name: "Apple",
+      Type: "food",
+      Effect: 1,
+      Amount: 1,
+      Sprite: "Apple.png",
+      Icon: "Apple_icon.png"
+   }
+};
+
+var Stage = {
+   6: {
+      Script: function () {
+         return "true";
+      },
+      Text: "It's an apple tree."
+   },
+   24: {                                     // Key matches engine UID
+      Script: function () {
+         if (this.Stock > 1) {               // If true, perform actions in engine
+            Trade(0, "add", 1, "Apple");
+            this.Stock -= 1;
+            return "true";
+         } else {
+            Trade(0, "add", 1, "Apple");
+            this.Stock -= 1;
+            return "false";
+         }
+      },
+      Stock: 1,
+      Text: "Got an Apple."
+   }
+}
+/*
+
+
+   "c2dictionary": true,                     // Engine JSON formatting
+   "data": {                                 // Steps to import and display in engine:
+      "2": {                                 // Set 1st key to Speaker variable - Character ID matching object UID in engine
+         "0": {                              // Set 2nd key to Topic variable
+            "NPC": {                         // Set 3rd key to dictionary - "Load from JSON" -> GetLines(Speaker, Topic, N/P)
+               "0": "Hello.",                // Get 4th keys using "For Each Key" -> create & set to text objects in NPC box
+            },
+            "PC": {                          // Set other 3rd key to dictionary, repeat above for PC box
+               "1": "Who are you?",          // Set value of selected key to Topic variable, repeat above
+               "2": "Goodbye."               // PC values = Player dialogue choices [KEY MATCHES NEXT TOPIC]
+            }
+         },
+
+
+
+
+var Player = {
    ATK: () => {
       switch (this.Weapon.Type) {
          case "sword": return this.Melee + bonus(this.INS);
@@ -332,160 +617,128 @@ var Enemy = {// new Character(2, "Enemy", "Asian", "Soldier", 1, {});        // 
    Y_pos: 0,
 };*/
 
-var Player = new Character(0, "Player", "European", "Guard", 1, {});
-var Enemy = new Character(2, "Enemy", "Asian", "Soldier", 1, {});
-var Cast = {
-   "0": Player,
-   "2": Enemy
-};
+/*
 
-var Props = {
-   Katana: {
-      Name: "Katana",               // Function reference and in-game display
-      Type: "sword",                // Function reference
-      ATK: 12,                      // Item stats
-      DMG: 10,
-      Creds: 500,                   // Sale / purchase value 
-      Amount: "",                   // Number in inventory
-      Sprite: "Katana.png",         // Images to display in-game (save in Construct -> Files)
-      Icon: "Katana_icon.png"
-   },
-   MP6: {
-      Name: "MP6",
-      Type: "gun",
-      ATK: 10,
-      DMG: 12,
-      Creds: 700,
-      Amount: "",
-      Sprite: "MP6.png",
-      Icon: "MP6_icon.png"
-   },
-   Leather_Coat: {
-      Name: "Leather Coat",
-      Type: "armor",
-      EVD: 12,
-      DEF: 10,
-      Creds: 150,
-      Amount: "",
-      Sprite: "Leather_Coat.png",
-      Icon: "Leather_Coat_icon.png"
-   },
-   SynTech_40x: {
-      Name: "SynTech 3000",
-      Type: "deck",
-      SEC: 10,
-      HAX: 10,
-      CPU: 12,
-      Creds: 1000,
-      Amount: "",
-      Sprite: "SynTech_3000.png",
-      Icon: "SynTech_3000_icon.png"
-   },
-   NiteViz: {
-      Name: "NiteViz",
-      Type: "chip",
-      SKL: "Alertness",
-      BNS: 1,                       // On skill check, add BNS
-      Creds: 250,
-      Amount: "",
-      Sprite: "NiteViz.png",
-      Icon: "NiteViz_icon.png"
-   },
-   //Crafting materials / consumables
-   Hydrocell: {                     // Source: merchants, NPC computers
-      Name: "Hydrocell",
-      Type: "material",             // Combines with "Antenna"
-      Amount: "",
-      Sprite: "Hydrocell.png",      // Image: blue box
-      Icon: "Hydrocell_icon.png"
-   },
-   Antenna: {                       // Source: merchants, NPC computers
-      Name: "Antenna",
-      Type: "material",             // Combines with "Hydrocell" 
-      Amount: "",
-      Sprite: "Antenna.png",        // Image: grey cylinder
-      Icon: "Antenna_icon.png"
-   },
-   Opium: {                         // Source: merchants, red flowers
-      Name: "Opium",
-      Type: "material",             // Combines with "Bleach"
-      Amount: "",
-      Sprite: "Opium.png",          // Image: green pod
-      Icon: "Opium_icon.png"
-   },
-   Bleach: {                        // Source: merchants, enemy NPCs
-      Name: "Bleach",
-      Type: "material",             // Combines with "Opium"
-      Amount: "",
-      Sprite: "Bleach.png",         // Image: brown bottle
-      Icon: "Bleach_icon.png"
-   },
-   Vitae: {                         // Combines with "Soma"
-      Name: "Vitae",
-      Type: "material",             // Source: vampires
-      Amount: "",
-      Sprite: "Vitae.png",          // Image: red vial
-      Icon: "Vitae_icon.png"
-   },
-   Soma: {                          // Combines with "Vitae" 
-      Name: "Soma",
-      Type: "material",             // Source: insects
-      Amount: "",
-      Sprite: "Soma.png",           // Image: yellow jar
-      Icon: "Soma_icon.png"
-   },
-   Charger_Full: {                  // Result of Craft("Hydrocell", "Antenna")
-      Name: "Charger (full)",
-      Type: "parts",                // Restores SP
-      Effect: 10,
-      Amount: "",
-      Sprite: "Charger.png",        // Image: green box (black wires)
-      Icon: "Charger_icon.png"
-   },
-   Morphine_Full: {                 // Result of Craft("Opium", "Bleach")
-      Name: "Morphine (full)",
-      Type: "meds",                 // Restores HP
-      Effect: 10,
-      Amount: "",
-      Sprite: "Morphine.png",       // Image: orange vial (white label)
-      Icon: "Morphine_icon.png"
-   },
-   Fetch_Full: {                    // Result of Craft("Vitae", "Soma")
-      Name: "Fetch (full)",         // Street version of the "Mead of Poetry"
-      Type: "drugs",                // Restores MP
-      Effect: 5,
-      Amount: "",
-      Sprite: "Fetch.png",          // Image: purple jar (grey cap) 
-      Icon: "Fetch_icon.png"
-   },
-   Charger_Half: {
-      Name: "Charger (half)",
-      Type: "parts",
-      Effect: 5,
-      Amount: "",
-      Sprite: "Charger_Half.png",
-      Icon: "Charger_icon.png"
-   },
-   Morphine_Half: {
-      Name: "Morphine (half)",
-      Type: "meds",
-      Effect: 5,
-      Amount: "",
-      Sprite: "Morphine_Half.png",
-      Icon: "Morphine_Half_icon.png"
-   },
-   Fetch_Half: {
-      Name: "Fetch (half)",
-      Type: "drugs",
-      Effect: 5,
-      Amount: "",
-      Sprite: "Fetch_Half.png",
-      Icon: "Fetch_Half_icon.png"
-   }
-};
-
-var Lines = {
-   Hello: "Hello"
-};
-
-
+var Player = { //new Character(0, "Player", "European", "Guard", 1, {});
+Abilities: "Defense",
+Angle: 360,
+Armor: {
+   Name: "Empty",
+   Type: "empty",
+   ATK: () => roll(5),        // Dice pool, eg. 2d10 = roll(10) + roll(10)
+   DMG: () => roll(5),
+   EVD: () => roll(5),
+   DEF: () => roll(5),
+   SEC: () => roll(5),
+   HAX: () => roll(5),
+   CPU: () => roll(5),
+   SKL: "Empty",
+   BNS: 0,
+   Effect: 0,
+   Creds: 0,
+   Amount: 1,
+   Sprite: "empty",
+   Icon: "empty"
+},
+CHA: 13,
+Chip: {
+   Name: "Empty",
+   Type: "empty",
+   ATK: () => roll(5),        // Dice pool, eg. 2d10 = roll(10) + roll(10)
+   DMG: () => roll(5),
+   EVD: () => roll(5),
+   DEF: () => roll(5),
+   SEC: () => roll(5),
+   HAX: () => roll(5),
+   CPU: () => roll(5),
+   SKL: "Empty",
+   BNS: 0,
+   Effect: 0,
+   Creds: 0,
+   Amount: 1,
+   Sprite: "empty",
+   Icon: "empty"
+},
+Class: "Guard",
+DEX: 13,
+Deck: {
+   Name: "Empty",
+   Type: "empty",
+   ATK: () => roll(5),        // Dice pool, eg. 2d10 = roll(10) + roll(10)
+   DMG: () => roll(5),
+   EVD: () => roll(5),
+   DEF: () => roll(5),
+   SEC: () => roll(5),
+   HAX: () => roll(5),
+   CPU: () => roll(5),
+   SKL: "Empty",
+   BNS: 0,
+   Effect: 0,
+   Creds: 0,
+   Amount: 1,
+   Sprite: "empty",
+   Icon: "empty"
+},
+EXP: 0,
+HP: 15,
+HP_min: 11,
+HUM: 14,
+ID: 0,
+INS: 16,
+INT: 15,
+Items: {
+   Empty: {
+   Name: "Empty",
+   Type: "empty",
+   ATK: () => roll(5),        // Dice pool, eg. 2d10 = roll(10) + roll(10)
+   DMG: () => roll(5),
+   EVD: () => roll(5),
+   DEF: () => roll(5),
+   SEC: () => roll(5),
+   HAX: () => roll(5),
+   CPU: () => roll(5),
+   SKL: "Empty",
+   BNS: 0,
+   Effect: 0,
+   Creds: 0,
+   Amount: 1,
+   Sprite: "empty",
+   Icon: "empty"
+}
+},
+Level: 1,
+MP: 12,
+MP_min: 20,
+Mood: 0,
+Name: "Player",
+Race: "European",
+SP: 14,
+SP_min: 11,
+STM: 16,
+STR: 14,
+Status: "idle",
+WIL: 11,
+WIT: 12,
+Weapon: {
+   Name: "Empty",
+   Type: "empty",
+   ATK: () => roll(5),        // Dice pool, eg. 2d10 = roll(10) + roll(10)
+   DMG: () => roll(5),
+   EVD: () => roll(5),
+   DEF: () => roll(5),
+   SEC: () => roll(5),
+   HAX: () => roll(5),
+   CPU: () => roll(5),
+   SKL: "Empty",
+   BNS: 0,
+   Effect: 0,
+   Creds: 0,
+   Amount: 1,
+   Sprite: "empty",
+   Icon: "empty"
+},
+X_pos: 0,
+Y_pos: 0
+}
+Object.setPrototypeOf(Player, Character);
+*/
