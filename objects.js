@@ -1,6 +1,6 @@
+
 // STORE CONSTRUCTOR OUTPUT - DO NOT CALL ON STARTUP
 // EXPLICIT DECLARATION OF PLAYER FOR TESTING ONLY - store args in local engine variables for Character creation
-
 
 //var Player = new Character(0, "Player", "European", "Guard", 1, {});
 var Player = JSON.parse('{"ID":0,"Name":"Player","Race":"European","Class":"Guard","Level":1,"EXP":0,"Status":"idle","Mood":0,"Angle":0,"Y_pos":0,"X_pos":0,"Items":{},"Weapon":{},"Armor":{},"Deck":{},"Chip":{},"STR":12,"DEX":13,"STM":16,"INT":14,"WIT":14,"CHA":14,"WIL":11,"INS":13,"HUM":13,"HP_min":13,"SP_min":18,"MP_min":13,"HP":17,"SP":16,"MP":14,"Abilities":"Defense"}');
@@ -14,8 +14,7 @@ var Cast = {
    2: Enemy        // NPC key must match UID in engine
 };
 
-// ENGINE CANNOT HANDLE NESTED OBJECTS - SEE GetLines() FUNCTION
-var Lines = {};
+var Lines = {};                                          // NPC dialogue - see GetLines()
 Lines = {
    2: {                                                  // NPC engine UID
       0: {                                               // Topic ID
@@ -43,7 +42,8 @@ Lines = {
       4: {
          // NPC: "Fine, I'll just pay someone else to do it.",
          Text: "1. Good luck. (LEAVE)",
-         1: "END"                                        // "END" value exits "talk" state
+         1: "END",                                       // "END" value exits "talk" state
+         Quest: 0                                        // Reset dialogue
       },
       // QUEST-SPECIFIC DIALOGUE:
       A0: {
@@ -54,23 +54,16 @@ Lines = {
       },
       A1: {                                              // Reset variable and call Trade() 
          // NPC: "Alright, hand them over then."
-         Text1: "1. (GIVE APPLES)",
-         Text2: "1. I don't have them.",
-         1: "A3",
-         2: "A2",
+         Path1: {
+            Text: "1. (GIVE APPLES)",
+            1: "A3"
+         },
+         Path2: {
+            Text: "1. I don't have them.",                 // FIX - PREVENT SELECTION OF OTHER!!!!!!!!!!!!!!!!!!!!
+            1: "A2",
+         },
          Script: function () {
-            return Player.Items.Apple ? "Text1" : "Text2";           // Display Text1 or Text2 in engine
-         }
-      },
-      A3: {
-         // NPC: "Excellent, heres your dollar. Run along now."
-         Text: "1. Thanks. (LEAVE)",
-         1: "END",
-         Quest: 0,                                       // End quest, reset dialogue
-         Script: function () {
-            Trade(0, "add", 1, "Credits");
-            Trade(0, "remove", 1, "Apple");
-            return "reward"
+            return Player.Items.Apple ? "Path1" : "Path2";  // Display Text1 or Text2 in engine
          }
       },
       A2: {                                              // No change to instance variable
@@ -78,11 +71,46 @@ Lines = {
          Text: "1. Okay. (LEAVE)",
          1: "END",
          Quest: "A0"                                     // Reset dialogue to quest start
+      },
+      A3: {
+         // NPC: "Excellent, heres your dollar. Run along now."
+         Text: "1. Thanks. (LEAVE)",
+         1: "END",
+         Quest: 0,                                       // End quest & reset dialogue
+         Script: function () {
+            Trade(0, "add", 1, "Credits");
+            Trade(0, "remove", 1, "Apple");
+            return "reward"
+         }
       }
    }
 };
 
-var Props = {
+var Stage = {                                // Interactive objects and scripted events
+   6: {
+      Script: function () {
+         return "true";
+      },
+      Text: "It's an apple tree."
+   },
+   24: {                                     // Key matches engine UID
+      Script: function () {
+         if (this.Stock > 1) {               // If true, perform actions in engine
+            Trade(0, "add", 1, "Apple");
+            this.Stock -= 1;
+            return "true";
+         } else {
+            Trade(0, "add", 1, "Apple");
+            this.Stock -= 1;
+            return "false";
+         }
+      },
+      Stock: 1,
+      Text: "Got an Apple."
+   }
+}
+
+var Props = {                       // Usable and equippable items
    Credits: {
       Name: "Credits",              // Function reference and in-game display
       Type: "money",                // Function reference
@@ -242,30 +270,6 @@ var Props = {
       Icon: "Apple_icon.png"
    }
 };
-
-var Stage = {
-   6: {
-      Script: function () {
-         return "true";
-      },
-      Text: "It's an apple tree."
-   },
-   24: {                                     // Key matches engine UID
-      Script: function () {
-         if (this.Stock > 1) {               // If true, perform actions in engine
-            Trade(0, "add", 1, "Apple");
-            this.Stock -= 1;
-            return "true";
-         } else {
-            Trade(0, "add", 1, "Apple");
-            this.Stock -= 1;
-            return "false";
-         }
-      },
-      Stock: 1,
-      Text: "Got an Apple."
-   }
-}
 /*
 
 

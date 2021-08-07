@@ -21,24 +21,26 @@ bonus = (atr) => {
 
 // Get current value of Status property for "NPC" Character object (args: engine UID) 
 GetStatus = (ID) => {
-   var My = Cast[ID];               // Engine JS: GetStatus(x) -> value = "state" -> set State
+   var My = Cast[ID];               // Engine usage: GetStatus(x) -> value = "state" -> set State
    return My.Status;
 }
 
-// Get value of property in "NPC" Character object (args: engine UID, "property name") 
-GetValue = (ID, object, property) => {
-   return this[object][ID][property];             // Eg. GetValue(x, HP) -> value == 0 -> State = "dead"
-}
-
-// Get nested object literals from Lines object (args: engine UID, topic name)
-GetLines = (ID, topic) => {
-   var data = Lines[ID][topic];
-   return JSON.stringify({ "c2dictionary": true, data });
+// Get properties or values from object literals (args: object name, engine UID or property, key, value)
+GetValue = (type, object, property, key, value) => {
+   var data;
+   if (value) {
+      data = this[object][property][key][value];            // this = global object
+   } else if (key) {
+      data = this[object][property][key];
+   } else {
+      data = this[object][property];
+   }
+   return type == 1 ? JSON.stringify({ "c2dictionary": true, data }) : data;
 }
 
 // Activate Script method of Stage object and return its Text property (args: engine UID)
 Activate = (ID, object, property) => {
-   return property ? this[object][ID][property].Script() : this[object][ID].Script();   // Call Script method of object
+   return property ? this[object][ID][property].Script?.() : this[object][ID].Script?.();    // Call Script method
 }
 
 // Set angle of Vector object in engine (args: Character, "direction")

@@ -1,5 +1,5 @@
 ﻿{
-	"version": 1627700278,
+	"version": 1628306060,
 	"fileList": [
 		"data.js",
 		"c2runtime.js",
@@ -17,10 +17,12 @@
 		"images/tree-sheet0.png",
 		"images/playervector-sheet0.png",
 		"images/enemyvector-sheet0.png",
-		"images/particles.png",
+		"images/blood.png",
 		"images/enemysprite-sheet0.png",
 		"images/apple-sheet0.png",
 		"images/playerfocus-sheet0.png",
+		"images/menu-sheet0.png",
+		"images/cursor-sheet0.png",
 		"media/20.ogg",
 		"media/21.ogg",
 		"media/22.ogg",
@@ -41,6 +43,7 @@
 		"objects.js",
 		"tree.scon",
 		"player.scon",
-		"enemy.scon"
+		"enemy.scon",
+		"menu.png"
 	]
 }
