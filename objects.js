@@ -138,7 +138,7 @@ var Props = {                       // Usable and equippable items
       Sprite: "MP6.png",
       Icon: "MP6_icon.png"
    },
-   Leather_Coat: {
+   "Leather Coat": {
       Name: "Leather Coat",
       Type: "armor",
       EVD: 12,
@@ -148,8 +148,8 @@ var Props = {                       // Usable and equippable items
       Sprite: "Leather_Coat.png",
       Icon: "Leather_Coat_icon.png"
    },
-   SynTech_40x: {
-      Name: "SynTech 3000",
+   "SynTech 40x": {
+      Name: "SynTech 40x",
       Type: "deck",
       SEC: 10,
       HAX: 10,
@@ -212,7 +212,7 @@ var Props = {                       // Usable and equippable items
       Sprite: "Soma.png",           // Image: yellow jar
       Icon: "Soma_icon.png"
    },
-   Charger_Full: {                  // Result of Craft("Hydrocell", "Antenna")
+   "Charger (full)": {                  // Result of Craft("Hydrocell", "Antenna")
       Name: "Charger (full)",
       Type: "parts",                // Restores SP
       Effect: 10,
@@ -220,7 +220,7 @@ var Props = {                       // Usable and equippable items
       Sprite: "Charger.png",        // Image: green box (black wires)
       Icon: "Charger_icon.png"
    },
-   Morphine_Full: {                 // Result of Craft("Opium", "Bleach")
+   "Morphine (full)": {                 // Result of Craft("Opium", "Bleach")
       Name: "Morphine (full)",
       Type: "meds",                 // Restores HP
       Effect: 10,
@@ -228,7 +228,7 @@ var Props = {                       // Usable and equippable items
       Sprite: "Morphine.png",       // Image: orange vial (white label)
       Icon: "Morphine_icon.png"
    },
-   Fetch_Full: {                    // Result of Craft("Vitae", "Soma")
+   "Fetch (full)": {                    // Result of Craft("Vitae", "Soma")
       Name: "Fetch (full)",         // Street version of the "Mead of Poetry"
       Type: "drugs",                // Restores MP
       Effect: 5,
@@ -236,7 +236,7 @@ var Props = {                       // Usable and equippable items
       Sprite: "Fetch.png",          // Image: purple jar (grey cap) 
       Icon: "Fetch_icon.png"
    },
-   Charger_Half: {
+   "Charger (half)": {
       Name: "Charger (half)",
       Type: "parts",
       Effect: 5,
@@ -244,7 +244,7 @@ var Props = {                       // Usable and equippable items
       Sprite: "Charger_Half.png",
       Icon: "Charger_icon.png"
    },
-   Morphine_Half: {
+   "Morphine (half)": {
       Name: "Morphine (half)",
       Type: "meds",
       Effect: 5,
@@ -252,7 +252,7 @@ var Props = {                       // Usable and equippable items
       Sprite: "Morphine_Half.png",
       Icon: "Morphine_Half_icon.png"
    },
-   Fetch_Half: {
+   "Fetch (half)": {
       Name: "Fetch (half)",
       Type: "drugs",
       Effect: 5,

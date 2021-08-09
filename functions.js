@@ -147,13 +147,13 @@ Talk = (ID1, ID2, skill, line) => {
 }
 
 // Add or remove items in Character inventory (args: engine UID, "add" OR "remove", number, item name)
-Trade = (ID, move, number, name) => {
+Trade = (ID, change, number, name) => {
    var My = Cast[ID];          // If called from Talk(), ID = Your.ID
 
-   if (move == "add") {
+   if (change == "add") {
       return My.Items[name] ? My.Items[name].Amount += number :
          (My.Items[name] = Props[name], My.Items[name].Amount = number);
-   } else if (move == "remove") {
+   } else if (change == "remove") {
       return My.Items[name].Amount > number ? My.Items[name].Amount -= number :
          delete My.Items[name];
    }
