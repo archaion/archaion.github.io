@@ -2,115 +2,9 @@
 // STORE CONSTRUCTOR OUTPUT - DO NOT CALL ON STARTUP
 // EXPLICIT DECLARATION OF PLAYER FOR TESTING ONLY - store args in local engine variables for Character creation
 
-//var Player = new Character(0, "Player", "European", "Guard", 1, {});
-var Player = JSON.parse('{"ID":0,"Name":"Player","Race":"European","Class":"Guard","Level":1,"EXP":0,"Status":"idle","Mood":0,"Angle":0,"Y_pos":0,"X_pos":0,"Items":{},"Weapon":{},"Armor":{},"Deck":{},"Chip":{},"STR":12,"DEX":13,"STM":16,"INT":14,"WIT":14,"CHA":14,"WIL":11,"INS":13,"HUM":13,"HP_min":13,"SP_min":18,"MP_min":13,"HP":17,"SP":16,"MP":14,"Abilities":"Defense"}');
-Player.Items.Empty = Player.Weapon = Player.Armor = Player.Chip = Player.Deck = { Name: "Empty", Type: "empty", ATK: () => roll(5), DMG: () => roll(5), EVD: () => roll(5), DEF: () => roll(5), SEC: () => roll(5), HAX: () => roll(5), CPU: () => roll(5), SKL: "Empty", BNS: 0, Effect: 0, Creds: 0, Amount: 1, Sprite: "empty", Icon: "empty" };
-Player.__proto__ = Character.prototype;
+var Cast = Lines = Stage = Props = Bill = {};
 
-var Enemy = new Character(2, "Enemy", "Asian", "Soldier", 1, {});
-
-var Cast = {
-   0: Player,
-   2: Enemy        // NPC key must match UID in engine
-};
-
-var Lines = {};                                          // NPC dialogue - see GetLines()
-Lines = {
-   2: {                                                  // NPC engine UID
-      0: {                                               // Topic ID
-         // NPC: "Yes? What do you want?"
-         Text: "1. Who are you?",                        // User input prompts, with newline before each
-         1: "1",                                         // Key = user input, value = next topic
-      },
-      1: {
-         // NPC: "The name's Goldman. I own this place."
-         Text: "1. Do you have any work for me?",
-         1: "2",
-      },
-      2: {
-         // NPC: "As a matter of fact, I do. Get me some apples from that tree over there and I'll pay you a dollar."
-         Text: "1. Okay, I'll be right back with your apples Mr. Goldman.\n2. No, get them yourself.",
-         1: "3",
-         2: "4",
-      },
-      3: {                                               // Accept quest = set INSTANCE variable
-         // NPC: "Very good. And be quick about it, I don't have all day."
-         Text: "1. Yes, sir. (LEAVE)",
-         1: "END",
-         Quest: "A0"                                     // Set to NPCs.Topic variable - "END" topic only
-      },
-      4: {
-         // NPC: "Fine, I'll just pay someone else to do it.",
-         Text: "1. Good luck. (LEAVE)",
-         1: "END",                                       // "END" value exits "talk" state
-         Quest: 0                                        // Reset dialogue
-      },
-      // QUEST-SPECIFIC DIALOGUE:
-      A0: {
-         //NPC: "Do you have those apples I asked for?"
-         Text: "1. Yes, here you go. \n2. No, I don't have them.",
-         1: "A1",                                        // Topic = quest "A1"
-         2: "A2"
-      },
-      A1: {                                              // Reset variable and call Trade() 
-         // NPC: "Alright, hand them over then."
-         Path1: {
-            Text: "1. (GIVE APPLES)",
-            1: "A3"
-         },
-         Path2: {
-            Text: "1. I don't have them.",                 // FIX - PREVENT SELECTION OF OTHER!!!!!!!!!!!!!!!!!!!!
-            1: "A2",
-         },
-         Script: function () {
-            return Player.Items.Apple ? "Path1" : "Path2";  // Display Text1 or Text2 in engine
-         }
-      },
-      A2: {                                              // No change to instance variable
-         // NPC: "Well hurry up and get them!"
-         Text: "1. Okay. (LEAVE)",
-         1: "END",
-         Quest: "A0"                                     // Reset dialogue to quest start
-      },
-      A3: {
-         // NPC: "Excellent, heres your dollar. Run along now."
-         Text: "1. Thanks. (LEAVE)",
-         1: "END",
-         Quest: 0,                                       // End quest & reset dialogue
-         Script: function () {
-            Trade(0, "add", 1, "Credits");
-            Trade(0, "remove", 1, "Apple");
-            return "reward"
-         }
-      }
-   }
-};
-
-var Stage = {                                // Interactive objects and scripted events
-   6: {
-      Script: function () {
-         return "true";
-      },
-      Text: "It's an apple tree."
-   },
-   24: {                                     // Key matches engine UID
-      Script: function () {
-         if (this.Stock > 1) {               // If true, perform actions in engine
-            Trade(0, "add", 1, "Apple");
-            this.Stock -= 1;
-            return "true";
-         } else {
-            Trade(0, "add", 1, "Apple");
-            this.Stock -= 1;
-            return "false";
-         }
-      },
-      Stock: 1,
-      Text: "Got an Apple."
-   }
-}
-
-var Props = {                       // Usable and equippable items
+Props = {                       // Usable and equippable items
    Credits: {
       Name: "Credits",              // Function reference and in-game display
       Type: "money",                // Function reference
@@ -127,6 +21,16 @@ var Props = {                       // Usable and equippable items
       Amount: 1,
       Sprite: "Katana.png",
       Icon: "Katana_icon.png"
+   },
+   Knife: {
+      Name: "Knife",
+      Type: "sword",
+      ATK: 5,                      // Item stats
+      DMG: 5,
+      Creds: 0,                   // Sale / purchase value 
+      Amount: 1,
+      Sprite: "Knife.png",
+      Icon: "Knife_icon.png"
    },
    MP6: {
       Name: "MP6",
@@ -147,6 +51,16 @@ var Props = {                       // Usable and equippable items
       Amount: 1,
       Sprite: "Leather_Coat.png",
       Icon: "Leather_Coat_icon.png"
+   },
+   "Street Clothes": {
+      Name: "Street Clothes",
+      Type: "armor",
+      EVD: 5,
+      DEF: 5,
+      Creds: 20,
+      Amount: 1,
+      Sprite: "Street_Clothes.png",
+      Icon: "Street_Clothes_icon.png"
    },
    "SynTech 40x": {
       Name: "SynTech 40x",
@@ -270,6 +184,141 @@ var Props = {                       // Usable and equippable items
       Icon: "Apple_icon.png"
    }
 };
+
+//var Player = new Character(0, "Player", "European", "Guard", 1, {});
+var Player = JSON.parse('{"ID":0,"Name":"Player","Race":"European","Class":"Guard","Level":1,"EXP":0,"Status":"idle","Mood":0,"Angle":0,"Y_pos":0,"X_pos":0,"Items":{},"Weapon":{},"Armor":{},"Deck":{},"Chip":{},"STR":12,"DEX":13,"STM":16,"INT":14,"WIT":14,"CHA":14,"WIL":11,"INS":13,"HUM":13,"HP_min":13,"SP_min":18,"MP_min":13,"HP":17,"SP":16,"MP":14,"Abilities":"Defense"}');
+Player.Items.Empty = Player.Chip = Player.Deck = { Name: "Empty", Type: "empty", ATK: () => roll(5), DMG: () => roll(5), EVD: () => roll(5), DEF: () => roll(5), SEC: () => roll(5), HAX: () => roll(5), CPU: () => roll(5), SKL: "Empty", BNS: 0, Effect: 0, Creds: 0, Amount: 1, Sprite: "empty", Icon: "empty" };
+Player.Items.Knife = Player.Weapon = Props["Knife"]
+Player.Items["Street Clothes"] = Player.Armor = Props["Street Clothes"]
+Player.__proto__ = Character.prototype;
+
+var Enemy = new Character(2, "Enemy", "Asian", "Soldier", 1, {});
+
+Cast = {                            // Player and NPC objects
+   0: Player,
+   2: Enemy        // NPC key must match UID in engine
+};
+
+Bill = {                        // Reference lists - call values in engine
+   Info: {
+      Name: Player.Name, Race: Player.Race, Class: Player.Class, Level: Player.Level, EXP: Player.EXP,
+      HP: Player.HP, SP: Player.SP, MP: Player.MP, HP_max: Player.HP_max(), SP_max: Player.SP_max(), MP_max: Player.MP_max(),
+      Weapon: Player.Weapon.Name, Armor: Player.Armor.Name, Deck: Player.Deck.Name, Chip: Player.Chip.Name
+   },
+   Stats: {
+      STR: Player.STR, DEX: Player.DEX, STM: Player.STM, 
+      INT: Player.INT, WIT: Player.WIT, CHA: Player.CHA,
+      WIL: Player.WIL, INS: Player.INS, HUM: Player.HUM,
+      ATK: Player.ATK, DMG: Player.DMG, DEF: Player.DEF, EVD: Player.EVD, 
+      CPU: Player.CPU, SEC: Player.SEC, HAX: Player.HAX,
+   },
+   Skills: {
+      Firearms: Player.Firearms(), Athletics: Player.Athletics(), Melee: Player.Melee(), Dodge: Player.Dodge(), 
+      Computer: Player.Computer(), Alertness: Player.Alertness(), Stealth: Player.Stealth(), Security: Player.Security(),
+      Repair: Player.Repair(), Technology: Player.Technology(), Medicine: Player.Medicine(), Survival: Player.Survival(),
+      Occult: Player.Occult(), Research: Player.Research(), Crafts: Player.Crafts(), Science: Player.Science(),
+      Finance: Player.Finance(), Etiquette: Player.Etiquette(), Intimidate: Player.Intimidate(), Streetwise: Player.Streetwise()
+   },
+   Feats: {
+      Abilities: Player.Abilities
+   }
+}
+
+Lines = {                           // NPC dialogue - see GetLines()
+   2: {                                                  // NPC engine UID
+      0: {                                               // Topic ID
+         // NPC: "Yes? What do you want?"
+         Text: "1. Who are you?",                        // User input prompts, with newline before each
+         1: "1",                                         // Key = user input, value = next topic
+      },
+      1: {
+         // NPC: "The name's Goldman. I own this place."
+         Text: "1. Do you have any work for me?",
+         1: "2",
+      },
+      2: {
+         // NPC: "As a matter of fact, I do. Get me some apples from that tree over there and I'll pay you a dollar."
+         Text: "1. Okay, I'll be right back with your apples Mr. Goldman.\n2. No, get them yourself.",
+         1: "3",
+         2: "4",
+      },
+      3: {                                               // Accept quest = set INSTANCE variable
+         // NPC: "Very good. And be quick about it, I don't have all day."
+         Text: "1. Yes, sir. (LEAVE)",
+         1: "END",
+         Quest: "A0"                                     // Set to NPCs.Topic variable - "END" topic only
+      },
+      4: {
+         // NPC: "Fine, I'll just pay someone else to do it.",
+         Text: "1. Good luck. (LEAVE)",
+         1: "END",                                       // "END" value exits "talk" state
+         Quest: 0                                        // Reset dialogue
+      },
+      // QUEST-SPECIFIC DIALOGUE:
+      A0: {
+         //NPC: "Do you have those apples I asked for?"
+         Text: "1. Yes, here you go. \n2. No, I don't have them.",
+         1: "A1",                                        // Topic = quest "A1"
+         2: "A2"
+      },
+      A1: {                                              // Reset variable and call Trade() 
+         // NPC: "Alright, hand them over then."
+         Path1: {
+            Text: "1. (GIVE APPLES)",
+            1: "A3"
+         },
+         Path2: {
+            Text: "1. I don't have them.",                 // FIX - PREVENT SELECTION OF OTHER!!!!!!!!!!!!!!!!!!!!
+            1: "A2",
+         },
+         Script: function () {
+            return Player.Items.Apple ? "Path1" : "Path2";  // Display Text1 or Text2 in engine
+         }
+      },
+      A2: {                                              // No change to instance variable
+         // NPC: "Well hurry up and get them!"
+         Text: "1. Okay. (LEAVE)",
+         1: "END",
+         Quest: "A0"                                     // Reset dialogue to quest start
+      },
+      A3: {
+         // NPC: "Excellent, heres your dollar. Run along now."
+         Text: "1. Thanks. (LEAVE)",
+         1: "END",
+         Quest: 0,                                       // End quest & reset dialogue
+         Script: function () {
+            Trade(0, "add", 1, "Credits");
+            Trade(0, "remove", 1, "Apple");
+            return "reward"
+         }
+      }
+   }
+};
+
+Stage = {                       // Interactive objects and scripted events
+   6: {
+      Script: function () {
+         return "true";
+      },
+      Text: "It's an apple tree."
+   },
+   24: {                                     // Key matches engine UID
+      Script: function () {
+         if (this.Stock > 1) {               // If true, perform actions in engine
+            Trade(0, "add", 1, "Apple");
+            this.Stock -= 1;
+            return "true";
+         } else {
+            Trade(0, "add", 1, "Apple");
+            this.Stock -= 1;
+            return "false";
+         }
+      },
+      Stock: 1,
+      Text: "Got an Apple."
+   }
+}
+
 /*
 
 

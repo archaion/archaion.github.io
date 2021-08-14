@@ -89,8 +89,8 @@ function Character(id, nam, rac, cls, lvl, itm) {
 
 // Vital stats
 Character.prototype.HP_max = function() { return this.HP_min + this.Level + bonus(this.STM)};
-Character.prototype.SP_max = function() { return this.HP_min + this.Level + bonus(this.INT)};
-Character.prototype.MP_max = function() { return this.HP_min + this.Level + bonus(this.WIL)};
+Character.prototype.SP_max = function() { return this.SP_min + this.Level + bonus(this.INT)};
+Character.prototype.MP_max = function() { return this.MP_min + this.Level + bonus(this.WIL)};
 
 // Combat stats
 Character.prototype.ATK = function () {
@@ -126,109 +126,109 @@ Character.prototype.SEC = function () {
 //------------------------------------ Skills
 // Combat spec
 Character.prototype.Firearms = function () {
-   return 10 + chip(this, "Firearms") + bonus(this.STR) +
+   return 10 + chip(this.ID, "Firearms") + bonus(this.STR) +
       (this.Class == "Soldier" ? 3 : (this.Class == "Guard" ? 1 : 0));
 };
 Character.prototype.Athletics = function () {
-   return 10 + chip(this, "Athletics") + bonus(this.WIL) +
+   return 10 + chip(this.ID, "Athletics") + bonus(this.WIL) +
       (this.Class == "Soldier" ? 2 : (this.Class == "Guard" ? 1 : 0));
 };
 Character.prototype.Melee = function () {
-   return 10 + chip(this, "Melee") + bonus(this.STR) +
+   return 10 + chip(this.ID, "Melee") + bonus(this.STR) +
       (this.Class == "Guard" ? 3 : (this.Class == "Soldier" ? 1 : 0));
 };
 Character.prototype.Dodge = function () {
-   return 10 + chip(this, "Dodge") + bonus(this.WIL) +
+   return 10 + chip(this.ID, "Dodge") + bonus(this.WIL) +
       (this.Class == "Guard" ? 2 : (this.Class == "Soldier" ? 1 : 0));
 };
 
 // Operations spec
 Character.prototype.Computer = function () {
-   return 10 + chip(this, "Computer") + bonus(this.DEX) +
+   return 10 + chip(this.ID, "Computer") + bonus(this.DEX) +
       (this.Class == "Hacker" ? 3 : (this.Class == "Thief" ? 1 : 0));
 };
 Character.prototype.Alertness = function () {
-   return 10 + chip(this, "Alertness") + bonus(this.WIL) +
+   return 10 + chip(this.ID, "Alertness") + bonus(this.WIL) +
       (this.Class == "Hacker" ? 2 : (this.Class == "Thief" ? 1 : 0));
 };
 Character.prototype.Stealth = function () {
-   return 10 + chip(this, "Stealth") + bonus(this.DEX) +
+   return 10 + chip(this.ID, "Stealth") + bonus(this.DEX) +
       (this.Class == "Thief" ? 3 : (this.Class == "Hacker" ? 1 : 0));
 };
 Character.prototype.Security = function () {
-   return 10 + chip(this, "Security") + bonus(this.WIL) +
+   return 10 + chip(this.ID, "Security") + bonus(this.WIL) +
       (this.Class == "Thief" ? 2 : (this.Class == "Hacker" ? 1 : 0));
 };
 
 // Support spec
 Character.prototype.Repair = function () {
-   return 10 + chip(this, "Repair") + bonus(this.STM) +
+   return 10 + chip(this.ID, "Repair") + bonus(this.STM) +
       (this.Class == "Tech" ? 3 : (this.Class == "Medic" ? 1 : 0));
 };
 Character.prototype.Technology = function () {
-   return 10 + chip(this, "Technology") + bonus(this.INS) +
+   return 10 + chip(this.ID, "Technology") + bonus(this.INS) +
       (this.Class == "Tech" ? 2 : (this.Class == "Medic" ? 1 : 0));
 };
 Character.prototype.Medicine = function () {
-   return 10 + chip(this, "Medicine") + bonus(this.STM) +
+   return 10 + chip(this.ID, "Medicine") + bonus(this.STM) +
       (this.Class == "Medic" ? 3 : (this.Class == "Tech" ? 1 : 0));
 };
 Character.prototype.Survival = function () {
-   return 10 + chip(this, "Survival") + bonus(this.INS) +
+   return 10 + chip(this.ID, "Survival") + bonus(this.INS) +
       (this.Class == "Medic" ? 2 : (this.Class == "Tech" ? 1 : 0));
 };
 
 // Unknown spec
 Character.prototype.Occult = function () {
-   return 10 + chip(this, "Occult") + bonus(this.WIT) +
+   return 10 + chip(this.ID, "Occult") + bonus(this.WIT) +
       (this.Class == "Scholar" ? 3 : (this.Class == "Artisan" ? 1 : 0));
 };
 Character.prototype.Research = function () {
-   return 10 + chip(this, "Research") + bonus(this.INS) +
+   return 10 + chip(this.ID, "Research") + bonus(this.INS) +
       (this.Class == "Scholar" ? 2 : (this.Class == "Artisan" ? 1 : 0));
 };
 Character.prototype.Crafts = function () {
-   return 10 + chip(this, "Crafts") + bonus(this.WIT) +
+   return 10 + chip(this.ID, "Crafts") + bonus(this.WIT) +
       (this.Class == "Artisan" ? 3 : (this.Class == "Scholar" ? 1 : 0));
 };
 Character.prototype.Science = function () {
-   return 10 + chip(this, "Science") + bonus(this.INS) +
+   return 10 + chip(this.ID, "Science") + bonus(this.INS) +
       (this.Class == "Artisan" ? 2 : (this.Class == "Scholar" ? 1 : 0));
 };
 
 // Business spec
 Character.prototype.Finance = function () {
-   return 10 + chip(this, "Finance") + bonus(this.INT) +
+   return 10 + chip(this.ID, "Finance") + bonus(this.INT) +
       (this.Class == "Trader" ? 3 : (this.Class == "Dealer" ? 1 : 0));
 };
 Character.prototype.Etiquette = function () {
-   return 10 + chip(this, "Etiquette") + bonus(this.HUM) +
+   return 10 + chip(this.ID, "Etiquette") + bonus(this.HUM) +
       (this.Class == "Trader" ? 2 : (this.Class == "Dealer" ? 1 : 0));
 };
 Character.prototype.Intimidate = function () {
-   return 10 + chip(this, "Intimidate") + bonus(this.INT) +
+   return 10 + chip(this.ID, "Intimidate") + bonus(this.INT) +
       (this.Class == "Dealer" ? 3 : (this.Class == "Trader" ? 1 : 0));
 };
 Character.prototype.Streetwise = function () {
-   return 10 + chip(this, "Streetwise") + bonus(this.HUM) +
+   return 10 + chip(this.ID, "Streetwise") + bonus(this.HUM) +
       (this.Class == "Dealer" ? 2 : (this.Class == "Trader" ? 1 : 0));
 };
 
 // Diplomacy spec
 Character.prototype.Politics = function () {
-   return 10 + chip(this, "Politics") + bonus(this.CHA) +
+   return 10 + chip(this.ID, "Politics") + bonus(this.CHA) +
       (this.Class == "Agent" ? 3 : (this.Class == "Officer" ? 1 : 0));
 };
 Character.prototype.Subterfuge = function () {
-   return 10 + chip(this, "Subterfuge") + bonus(this.HUM) +
+   return 10 + chip(this.ID, "Subterfuge") + bonus(this.HUM) +
       (this.Class == "Agent" ? 2 : (this.Class == "Officer" ? 1 : 0));
 };
 Character.prototype.Investigate = function () {
-   return 10 + chip(this, "Investigate") + bonus(this.CHA) +
+   return 10 + chip(this.ID, "Investigate") + bonus(this.CHA) +
       (this.Class == "Officer" ? 3 : (this.Class == "Agent" ? 1 : 0));
 };
 Character.prototype.Intuition = function () {
-   return 10 + chip(this, "Intuition") + bonus(this.HUM) +
+   return 10 + chip(this.ID, "Intuition") + bonus(this.HUM) +
       (this.Class == "Officer" ? 2 : (this.Class == "Agent" ? 1 : 0));
 };
 

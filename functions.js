@@ -7,7 +7,10 @@ var context = new AudioContext();
 roll = (max) => Math.floor(Math.random() * max) + 1;
 
 // Skill bonus from equipment (args: Character, "skill name")
-chip = (My, skill) => My.Chip.SKL == skill ? My.Chip.BNS : 0;
+chip = (ID, skill) => {
+   var My = Cast[ID];
+   return My.Chip.SKL == skill ? My.Chip.BNS : 0;
+}
 
 // Attribute and skill bonuses (args: Character.ATTRIBUTE)
 bonus = (atr) => {
@@ -32,8 +35,10 @@ GetValue = (type, object, property, key, value) => {
       data = this[object][property][key][value];            // this = global object
    } else if (key) {
       data = this[object][property][key];
-   } else {
+   } else if (property)  {
       data = this[object][property];
+   } else {
+      data = this[object];
    }
    return type == 1 ? JSON.stringify({ "c2dictionary": true, data }) : data;
 }
