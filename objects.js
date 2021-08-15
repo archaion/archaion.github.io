@@ -1,10 +1,28 @@
 
-// STORE CONSTRUCTOR OUTPUT - DO NOT CALL ON STARTUP
+// STORE CONSTRUCTOR OUTPUT AS JSON & LOAD ON ENGINE START - DO NOT CALL ON STARTUT
 // EXPLICIT DECLARATION OF PLAYER FOR TESTING ONLY - store args in local engine variables for Character creation
 
 var Cast = Lines = Stage = Props = Bill = {};
 
-Props = {                       // Usable and equippable items
+Props = {                        // Usable and equippable items
+   Empty: {                      // Placeholder
+      Name: "Empty",
+      Type: "empty",
+      ATK: () => roll(0),
+      DMG: () => roll(0),
+      EVD: () => roll(0),
+      DEF: () => roll(0),
+      SEC: () => roll(0),
+      HAX: () => roll(0),
+      CPU: () => roll(0),
+      SKL: "Empty",
+      BNS: 0,
+      Effect: 0,
+      Creds: 0,
+      Amount: 1,
+      Sprite: "empty",
+      Icon: "empty"
+   },
    Credits: {
       Name: "Credits",              // Function reference and in-game display
       Type: "money",                // Function reference
@@ -15,8 +33,8 @@ Props = {                       // Usable and equippable items
    Katana: {
       Name: "Katana",
       Type: "sword",
-      ATK: 12,                      // Item stats
-      DMG: 10,
+      ATK: () => roll(12),                      // Item stats
+      DMG: () => roll(10),
       Creds: 500,                   // Sale / purchase value 
       Amount: 1,
       Sprite: "Katana.png",
@@ -25,8 +43,8 @@ Props = {                       // Usable and equippable items
    Knife: {
       Name: "Knife",
       Type: "sword",
-      ATK: 5,                      // Item stats
-      DMG: 5,
+      ATK: () => roll(5),                      // Item stats
+      DMG: () => roll(5),
       Creds: 0,                   // Sale / purchase value 
       Amount: 1,
       Sprite: "Knife.png",
@@ -35,8 +53,8 @@ Props = {                       // Usable and equippable items
    MP6: {
       Name: "MP6",
       Type: "gun",
-      ATK: 10,
-      DMG: 12,
+      ATK: () => roll(10),
+      DMG: () => roll(12),
       Creds: 700,
       Amount: 1,
       Sprite: "MP6.png",
@@ -45,8 +63,8 @@ Props = {                       // Usable and equippable items
    "Leather Coat": {
       Name: "Leather Coat",
       Type: "armor",
-      EVD: 12,
-      DEF: 10,
+      EVD: () => roll(12),
+      DEF: () => roll(10),
       Creds: 150,
       Amount: 1,
       Sprite: "Leather_Coat.png",
@@ -55,8 +73,8 @@ Props = {                       // Usable and equippable items
    "Street Clothes": {
       Name: "Street Clothes",
       Type: "armor",
-      EVD: 5,
-      DEF: 5,
+      EVD: () => roll(12),
+      DEF: () => roll(10),
       Creds: 20,
       Amount: 1,
       Sprite: "Street_Clothes.png",
@@ -65,9 +83,9 @@ Props = {                       // Usable and equippable items
    "SynTech 40x": {
       Name: "SynTech 40x",
       Type: "deck",
-      SEC: 10,
-      HAX: 10,
-      CPU: 12,
+      SEC: () => roll(10),
+      HAX: () => roll(10),
+      CPU: () => roll(12),
       Creds: 1000,
       Amount: 1,
       Sprite: "SynTech_3000.png",
@@ -186,10 +204,11 @@ Props = {                       // Usable and equippable items
 };
 
 //var Player = new Character(0, "Player", "European", "Guard", 1, {});
-var Player = JSON.parse('{"ID":0,"Name":"Player","Race":"European","Class":"Guard","Level":1,"EXP":0,"Status":"idle","Mood":0,"Angle":0,"Y_pos":0,"X_pos":0,"Items":{},"Weapon":{},"Armor":{},"Deck":{},"Chip":{},"STR":12,"DEX":13,"STM":16,"INT":14,"WIT":14,"CHA":14,"WIL":11,"INS":13,"HUM":13,"HP_min":13,"SP_min":18,"MP_min":13,"HP":17,"SP":16,"MP":14,"Abilities":"Defense"}');
-Player.Items.Empty = Player.Chip = Player.Deck = { Name: "Empty", Type: "empty", ATK: () => roll(5), DMG: () => roll(5), EVD: () => roll(5), DEF: () => roll(5), SEC: () => roll(5), HAX: () => roll(5), CPU: () => roll(5), SKL: "Empty", BNS: 0, Effect: 0, Creds: 0, Amount: 1, Sprite: "empty", Icon: "empty" };
-Player.Items.Knife = Player.Weapon = Props["Knife"]
-Player.Items["Street Clothes"] = Player.Armor = Props["Street Clothes"]
+var Player = JSON.parse('{"ID":0,"Name":"Player","Race":"European","Class":"Guard","Level":1,"EXP":0,"Status":"idle","Mood":0,"Angle":0,"Y_pos":0,"X_pos":0,"Quests":{},"Items":{},"Weapon":{},"Armor":{},"Deck":{},"Chip":{},"STR":12,"DEX":13,"STM":16,"INT":14,"WIT":14,"CHA":14,"WIL":11,"INS":13,"HUM":13,"HP_min":13,"SP_min":18,"MP_min":13,"HP":17,"SP":16,"MP":14}');
+Player.Chip = Player.Deck = Props["Empty"];
+Player.Weapon = Player.Items.Knife = Props["Knife"];
+Player.Armor = Player.Items["Street Clothes"] = Props["Street Clothes"];
+Player.Abilities = { Name: "Defense", Caption: "Increase your DEX and reduce enemy STR by 1d10 for 30s" }
 Player.__proto__ = Character.prototype;
 
 var Enemy = new Character(2, "Enemy", "Asian", "Soldier", 1, {});
@@ -199,28 +218,33 @@ Cast = {                            // Player and NPC objects
    2: Enemy        // NPC key must match UID in engine
 };
 
-Bill = {                        // Reference lists - call values in engine
-   Info: {
-      Name: Player.Name, Race: Player.Race, Class: Player.Class, Level: Player.Level, EXP: Player.EXP,
-      HP: Player.HP, SP: Player.SP, MP: Player.MP, HP_max: Player.HP_max(), SP_max: Player.SP_max(), MP_max: Player.MP_max(),
-      Weapon: Player.Weapon.Name, Armor: Player.Armor.Name, Deck: Player.Deck.Name, Chip: Player.Chip.Name
+Bill = {                        // Menu reference lists - call values in engine
+   Character: {
+      Info: {
+         Name: Player.Name, Race: Player.Race, Class: Player.Class, Level: Player.Level, EXP: Player.EXP,
+         HP: Player.HP, SP: Player.SP, MP: Player.MP, HP_max: Player.HP_max(), SP_max: Player.SP_max(), MP_max: Player.MP_max(),
+         Weapon: Player.Weapon.Name, Armor: Player.Armor.Name, Deck: Player.Deck.Name, Chip: Player.Chip.Name
+      },
+      Stats: {
+         STR: Player.STR, DEX: Player.DEX, STM: Player.STM,
+         INT: Player.INT, WIT: Player.WIT, CHA: Player.CHA,
+         WIL: Player.WIL, INS: Player.INS, HUM: Player.HUM,
+         ATK: Player.ATK, DMG: Player.DMG, DEF: Player.DEF, EVD: Player.EVD,
+         CPU: Player.CPU, SEC: Player.SEC, HAX: Player.HAX,
+      },
+      Skills: {
+         Firearms: Player.Firearms(), Athletics: Player.Athletics(), Melee: Player.Melee(), Dodge: Player.Dodge(),
+         Computer: Player.Computer(), Alertness: Player.Alertness(), Stealth: Player.Stealth(), Security: Player.Security(),
+         Repair: Player.Repair(), Technology: Player.Technology(), Medicine: Player.Medicine(), Survival: Player.Survival(),
+         Occult: Player.Occult(), Research: Player.Research(), Crafts: Player.Crafts(), Science: Player.Science(),
+         Finance: Player.Finance(), Etiquette: Player.Etiquette(), Intimidate: Player.Intimidate(), Streetwise: Player.Streetwise()
+      },
+      Feats: {
+         Ability: Player.Abilities.Name, Description: Player.Abilities.Caption
+      }
    },
-   Stats: {
-      STR: Player.STR, DEX: Player.DEX, STM: Player.STM, 
-      INT: Player.INT, WIT: Player.WIT, CHA: Player.CHA,
-      WIL: Player.WIL, INS: Player.INS, HUM: Player.HUM,
-      ATK: Player.ATK, DMG: Player.DMG, DEF: Player.DEF, EVD: Player.EVD, 
-      CPU: Player.CPU, SEC: Player.SEC, HAX: Player.HAX,
-   },
-   Skills: {
-      Firearms: Player.Firearms(), Athletics: Player.Athletics(), Melee: Player.Melee(), Dodge: Player.Dodge(), 
-      Computer: Player.Computer(), Alertness: Player.Alertness(), Stealth: Player.Stealth(), Security: Player.Security(),
-      Repair: Player.Repair(), Technology: Player.Technology(), Medicine: Player.Medicine(), Survival: Player.Survival(),
-      Occult: Player.Occult(), Research: Player.Research(), Crafts: Player.Crafts(), Science: Player.Science(),
-      Finance: Player.Finance(), Etiquette: Player.Etiquette(), Intimidate: Player.Intimidate(), Streetwise: Player.Streetwise()
-   },
-   Feats: {
-      Abilities: Player.Abilities
+   Quests: {
+         Active: Player.Quests
    }
 }
 
@@ -246,7 +270,10 @@ Lines = {                           // NPC dialogue - see GetLines()
          // NPC: "Very good. And be quick about it, I don't have all day."
          Text: "1. Yes, sir. (LEAVE)",
          1: "END",
-         Quest: "A0"                                     // Set to NPCs.Topic variable - "END" topic only
+         Quest: "A0",                                     // Set to NPCs.Topic variable - "END" topic only
+         Script: function () {
+            return Player.Quests["Goldman"] = {A0: "Bring the apples to Goldman."};    // Key = NPC ID, value = description !!!!!!!!!
+         }
       },
       4: {
          // NPC: "Fine, I'll just pay someone else to do it.",
@@ -268,7 +295,7 @@ Lines = {                           // NPC dialogue - see GetLines()
             1: "A3"
          },
          Path2: {
-            Text: "1. I don't have them.",                 // FIX - PREVENT SELECTION OF OTHER!!!!!!!!!!!!!!!!!!!!
+            Text: "1. I don't have them.",
             1: "A2",
          },
          Script: function () {
@@ -286,7 +313,8 @@ Lines = {                           // NPC dialogue - see GetLines()
          Text: "1. Thanks. (LEAVE)",
          1: "END",
          Quest: 0,                                       // End quest & reset dialogue
-         Script: function () {
+         Script: function () { 
+            delete Player.Quests["Goldman"];
             Trade(0, "add", 1, "Credits");
             Trade(0, "remove", 1, "Apple");
             return "reward"

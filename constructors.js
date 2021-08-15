@@ -16,6 +16,7 @@ function Character(id, nam, rac, cls, lvl, itm) {
    // States
    this.Status = "idle";   // Transition to corresponding state (engine)
    this.Mood = 0;
+   this.Quests = {};
 
    // Engine (read only)
    this.Angle = 0;         // Degrees clockwise from right (engine)
@@ -88,9 +89,9 @@ function Character(id, nam, rac, cls, lvl, itm) {
 //////////////////////////////////////// PROTOTYPE FUNCTIONS ////////////////////////////////////////
 
 // Vital stats
-Character.prototype.HP_max = function() { return this.HP_min + this.Level + bonus(this.STM)};
-Character.prototype.SP_max = function() { return this.SP_min + this.Level + bonus(this.INT)};
-Character.prototype.MP_max = function() { return this.MP_min + this.Level + bonus(this.WIL)};
+Character.prototype.HP_max = function () { return this.HP_min + this.Level + bonus(this.STM) };
+Character.prototype.SP_max = function () { return this.SP_min + this.Level + bonus(this.INT) };
+Character.prototype.MP_max = function () { return this.MP_min + this.Level + bonus(this.WIL) };
 
 // Combat stats
 Character.prototype.ATK = function () {
@@ -235,18 +236,18 @@ Character.prototype.Intuition = function () {
 // Abilities
 Character.prototype.Abilities_cls = function () {
    switch (this.Class) {
-      case "Soldier": return "Vengeance";
-      case "Guard": return "Defense";
-      case "Hacker": return "Celerity";
-      case "Thief": return "Obfuscate";
-      case "Tech": return "Redemption";
-      case "Medic": return "Martyrdom";
-      case "Scholar": return "Visionary";
-      case "Artisan": return "Innocence";
-      case "Trader": return "Auspex";
-      case "Dealer": return "Dominate";
-      case "Agent": return "Presence";
-      case "Officer": return "Judgement";
+      case "Soldier": return { Name: "Vengeance", Caption: "Increase your STR and reduce enemy DEX by 1d10 for 30s" };
+      case "Guard": return { Name: "Defense", Caption: "Increase your DEX and reduce enemy STR by 1d10 for 30s" };
+      case "Hacker": return { Name: "Celerity", Caption: "Increase your DEX and reduce enemy WIL by 1d10 for 30s" };
+      case "Thief": return { Name: "Obfuscate", Caption: "Increase your WIL and reduce enemy DEX by 1d10 for 30s" };
+      case "Tech": return { Name: "Redemption", Caption: "Increase your STM and reduce enemy WIT by 1d10 for 30s" };
+      case "Medic": return { Name: "Martyrdom", Caption: "Increase your WIT and reduce enemy STM by 1d10 for 30s" };
+      case "Scholar": return { Name: "Visionary", Caption: "Increase your INS and reduce enemy WIT by 1d10 for 30s" };
+      case "Artisan": return { Name: "Innocence", Caption: "Increase your WIT and reduce enemy INS by 1d10 for 30s" };
+      case "Trader": return { Name: "Auspex", Caption: "Increase your INT and reduce enemy CHA by 1d10 for 30s" };
+      case "Dealer": return { Name: "Dominate", Caption: "Increase your CHA and reduce enemy INT by 1d10 for 30s" };
+      case "Agent": return { Name: "Presence", Caption: "Increase your CHA and reduce enemy HUM by 1d10 for 30s" };
+      case "Officer": return { Name: "Judgement", Caption: "Increase your HUM and reduce enemy CHA by 1d10 for 30s" };
    }
 }
 
@@ -265,7 +266,7 @@ Skill = (My, skill) => {
          case "Alertness": My.Class == "Hacker" ? perk = 2 : (My.Class == "Thief" ? perk = 1 : perk = 0);
          case "Stealth": My.Class == "Thief" ? perk = 3 : (My.Class == "Hacker" ? perk = 1 : perk = 0);
          case "Security": My.Class == "Thief" ? perk = 2 : (My.Class == "Hacker" ? perk = 1 : perk = 0);
-         case "Repair": 
+         case "Repair":
          case "Technology": perk =
          case "Medicine": perk =
          case "Survival": perk =

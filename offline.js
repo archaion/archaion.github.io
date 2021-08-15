@@ -1,5 +1,5 @@
 ﻿{
-	"version": 1628954788,
+	"version": 1629024270,
 	"fileList": [
 		"data.js",
 		"c2runtime.js",
@@ -22,7 +22,9 @@
 		"images/apple-sheet0.png",
 		"images/playerfocus-sheet0.png",
 		"images/menu-sheet0.png",
+		"images/menu-sheet1.png",
 		"images/cursor-sheet0.png",
+		"images/logo-sheet0.png",
 		"media/20.ogg",
 		"media/21.ogg",
 		"media/22.ogg",
