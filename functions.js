@@ -85,11 +85,11 @@ Equip = (ID, item) => {
       equipment = My.Items[item];
 
    switch (equipment.Type) {
-      case "sword":
-      case "gun": return My.Weapon = equipment;
-      case "armor": return My.Armor = equipment;
-      case "deck": return My.Deck = equipment;
-      case "chip": return My.Chip = equipment;
+      case "Sword":
+      case "Gun": return My.Weapon = equipment;
+      case "Armor": return My.Armor = equipment;
+      case "Deck": return My.Deck = equipment;
+      case "Chip": return My.Chip = equipment;
    }
 }
 
@@ -97,21 +97,21 @@ Equip = (ID, item) => {
 Attack = (ID1, ID2) => {
    var My = Cast[ID1], Your = Cast[ID2], result;
 
-   if (My.Weapon.Type == "sword" || My.Weapon.Type == "empty") {
+   if (My.Weapon.Type == "Sword" || My.Weapon.Type == "Empty") {
       if (roll(10) + My.ATK() + My.Weapon.ATK() > roll(10) + Your.DEF() + Your.Armor.DEF()) {     // Hitbox collision
          result = My.DMG() + My.Weapon.DMG() - bonus(Your.STM);
          return result > 0 ? Your.HP -= result : "miss";
       } return "miss";
    }
 
-   if (My.Weapon.Type == "gun") {
+   if (My.Weapon.Type == "Gun") {
       if (roll(10) + My.ATK() + My.Weapon.ATK() > roll(10) + Your.EVD() + Your.Armor.EVD()) {     // LoS collision
          result = My.DMG() + My.Weapon.DMG() - bonus(Your.STM);
          return result > 0 ? Your.HP -= result : "miss";
       } return "miss";
    }
 
-   if (My.Weapon.Type == "deck") {
+   if (My.Weapon.Type == "Deck") {
       if (roll(10) + My.HAX() + My.Deck.HAX() > roll(10) + Your.SEC() + Your.Deck.SEC()) {
          result = My.CPU() + My.Weapon.CPU() - bonus(Your.INT);
          return result > 0 ? Your.SP -= result : "miss";
@@ -180,7 +180,7 @@ Craft = (ID, itemA, itemB) => {
                My.Items.Charger_Full.Amount += 1 :                // Increase existing item amount, or create new item
                My.Items.Charger_Full = {
                   Name: "Charger (full)",
-                  Type: "parts",
+                  Type: "Parts",
                   Effect: 10,
                   Amount: 1,
                   Sprite: "Charger_Full.png",
@@ -191,7 +191,7 @@ Craft = (ID, itemA, itemB) => {
                My.Items.Charger_Half.Amount += 1 :
                My.Items.Charger_Half = {
                   Name: "Charger (half)",
-                  Type: "parts",
+                  Type: "Parts",
                   Effect: 5,
                   Amount: 1,
                   Sprite: "Charger_Half.png",
@@ -206,7 +206,7 @@ Craft = (ID, itemA, itemB) => {
                My.Items.Morphine_Full.Amount += 1 :
                My.Items.Morphine_Full = {
                   Name: "Morphine (full)",
-                  Type: "meds",
+                  Type: "Meds",
                   Effect: 10,
                   Amount: 1,
                   Sprite: "Morphine_Full.png",
@@ -217,7 +217,7 @@ Craft = (ID, itemA, itemB) => {
                My.Items.Morphine_Half.Amount += 1 :
                My.Items.Morphine_Half = {
                   Name: "Morphine (half)",
-                  Type: "meds",
+                  Type: "Meds",
                   Effect: 5,
                   Amount: 1,
                   Sprite: "Morphine_Half.png",
@@ -232,7 +232,7 @@ Craft = (ID, itemA, itemB) => {
                My.Items.Fetch_Full.Amount += 1 :
                My.Items.Fetch_Full = {
                   Name: "Fetch (full)",
-                  Type: "drugs",
+                  Type: "Drugs",
                   Effect: 10,
                   Amount: 1,
                   Sprite: "Fetch_Full.png",
@@ -243,7 +243,7 @@ Craft = (ID, itemA, itemB) => {
                My.Items.Fetch_Half.Amount += 1 :
                My.Items.Fetch_Half = {
                   Name: "Fetch (half)",
-                  Type: "drugs",
+                  Type: "Drugs",
                   Effect: 5,
                   Amount: 1,
                   Sprite: "Fetch_Half.png",
@@ -260,9 +260,9 @@ Heal = (ID1, ID2, itm) => {
       mine, yours, check, target, effect;
 
    switch (item.Type) {
-      case "parts": (mine = My.Repair(), yours = Your.Technology()); break;   // Use "Charger" item
-      case "meds": (mine = My.Medicine(), yours = Your.Science()); break;     // Use "Morphine" item
-      case "drugs": (mine = My.Occult(), yours = Your.Survival()); break;     // Use "Fetch" item
+      case "Parts": (mine = My.Repair(), yours = Your.Technology()); break;   // Use "Charger" item
+      case "Meds": (mine = My.Medicine(), yours = Your.Science()); break;     // Use "Morphine" item
+      case "Drugs": (mine = My.Occult(), yours = Your.Survival()); break;     // Use "Fetch" item
    }
 
    check = mine + roll(10);                                                   // Roll check
@@ -273,18 +273,18 @@ Heal = (ID1, ID2, itm) => {
 
    if (check > target) {                                                      // Success: limited stat increase
       switch (item.Type) {
-         case "parts": return Your.SP < Your.SP_max() - effect ?
+         case "Parts": return Your.SP < Your.SP_max() - effect ?
             Your.SP += effect : Your.SP = Your.SP_max();
-         case "meds": return Your.HP < Your.HP_max() - effect ?
+         case "Meds": return Your.HP < Your.HP_max() - effect ?
             Your.HP += effect : Your.HP = Your.HP_max();
-         case "drugs": return Your.MP < Your.MP_max() - effect ?
+         case "Drugs": return Your.MP < Your.MP_max() - effect ?
             Your.MP += effect : Your.MP = Your.MP_max();
       }
    } else {                                                                   // Failure: stat decrease
       switch (item.Type) {
-         case "parts": return Your.MP -= item.Effect - (target - check);
-         case "meds": return Your.SP -= item.Effect - (target - check);
-         case "drugs": return Your.HP -= item.Effect - (target - check);
+         case "Parts": return Your.MP -= item.Effect - (target - check);
+         case "Meds": return Your.SP -= item.Effect - (target - check);
+         case "Drugs": return Your.HP -= item.Effect - (target - check);
       }
    }
 }

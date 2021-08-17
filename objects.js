@@ -7,7 +7,7 @@ var Cast = Lines = Stage = Props = Bill = {};
 Props = {                        // Usable and equippable items
    Empty: {                      // Placeholder
       Name: "Empty",
-      Type: "empty",
+      Type: "Empty",
       ATK: () => roll(0),
       DMG: () => roll(0),
       EVD: () => roll(0),
@@ -18,85 +18,101 @@ Props = {                        // Usable and equippable items
       SKL: "Empty",
       BNS: 0,
       Effect: 0,
-      Creds: 0,
+      Credits: 0,
       Amount: 1,
       Sprite: "empty",
       Icon: "empty"
    },
    Credits: {
       Name: "Credits",              // Function reference and in-game display
-      Type: "money",                // Function reference
+      Type: "Money",                // Function reference
+      Description: "The root of many evils.",
       Amount: 1,                    // Number in inventory (default 1)
       Sprite: "Credits.png",        // Images to display in-game (save in Construct -> Files)
       Icon: "Credits_icon.png"
    },
    Katana: {
       Name: "Katana",
-      Type: "sword",
-      ATK: () => roll(12),                      // Item stats
+      Type: "Sword",
+      ATK: () => roll(12),          // Item stats
       DMG: () => roll(10),
-      Creds: 500,                   // Sale / purchase value 
+      Attack: "1d12",               // Engine display values
+      Damage: "1d10",
+      Credits: 500,                   // Sale / purchase value 
       Amount: 1,
       Sprite: "Katana.png",
       Icon: "Katana_icon.png"
    },
    Knife: {
       Name: "Knife",
-      Type: "sword",
-      ATK: () => roll(5),                      // Item stats
+      Type: "Sword",
+      ATK: () => roll(5),
       DMG: () => roll(5),
-      Creds: 0,                   // Sale / purchase value 
+      Attack: "1d5",
+      Damage: "1d5",
+      Credits: 10, 
       Amount: 1,
       Sprite: "Knife.png",
       Icon: "Knife_icon.png"
    },
    MP6: {
       Name: "MP6",
-      Type: "gun",
+      Type: "Gun",
       ATK: () => roll(10),
       DMG: () => roll(12),
-      Creds: 700,
+      Attack: "1d10",
+      Damage: "1d12",
+      Credits: 700,
       Amount: 1,
       Sprite: "MP6.png",
       Icon: "MP6_icon.png"
    },
    "Leather Coat": {
       Name: "Leather Coat",
-      Type: "armor",
+      Type: "Armor",
       EVD: () => roll(12),
       DEF: () => roll(10),
-      Creds: 150,
+      Evade: "1d12",
+      Defense: "1d10",
+      Credits: 150,
       Amount: 1,
       Sprite: "Leather_Coat.png",
       Icon: "Leather_Coat_icon.png"
    },
    "Street Clothes": {
       Name: "Street Clothes",
-      Type: "armor",
-      EVD: () => roll(12),
-      DEF: () => roll(10),
-      Creds: 20,
+      Type: "Armor",
+      EVD: () => roll(5),
+      DEF: () => roll(5),
+      Evade: "1d5",
+      Defense: "1d5",
+      Credits: 20,
       Amount: 1,
       Sprite: "Street_Clothes.png",
       Icon: "Street_Clothes_icon.png"
    },
    "SynTech 40x": {
       Name: "SynTech 40x",
-      Type: "deck",
+      Type: "Deck",
       SEC: () => roll(10),
       HAX: () => roll(10),
       CPU: () => roll(12),
-      Creds: 1000,
+      Speed: "1d12",
+      Hack: "1d10",
+      Cipher: "1d12",
+      Credits: 1000,
       Amount: 1,
       Sprite: "SynTech_3000.png",
       Icon: "SynTech_3000_icon.png"
    },
    NiteViz: {
       Name: "NiteViz",
-      Type: "chip",
+      Type: "Chip",
       SKL: "Alertness",
       BNS: 1,                       // On skill check, add BNS
-      Creds: 250,
+      Skill: "Alertness",
+      Bonus: 1,
+      Credits: 250,
       Amount: 1,
       Sprite: "NiteViz.png",
       Icon: "NiteViz_icon.png"
@@ -104,49 +120,56 @@ Props = {                        // Usable and equippable items
    //Crafting materials / consumables
    Hydrocell: {                     // Source: merchants, NPC computers
       Name: "Hydrocell",
-      Type: "material",             // Combines with "Antenna"
+      Type: "Material",             
+      Description: "Combines with Antenna",
       Amount: 1,
       Sprite: "Hydrocell.png",      // Image: blue box
       Icon: "Hydrocell_icon.png"
    },
    Antenna: {                       // Source: merchants, NPC computers
       Name: "Antenna",
-      Type: "material",             // Combines with "Hydrocell" 
+      Type: "Material",             
+      Description: "Combines with Hydrocell", 
       Amount: 1,
       Sprite: "Antenna.png",        // Image: grey cylinder
       Icon: "Antenna_icon.png"
    },
    Opium: {                         // Source: merchants, red flowers
       Name: "Opium",
-      Type: "material",             // Combines with "Bleach"
+      Type: "Material",             
+      Description: "Combines with Bleach",
       Amount: 1,
       Sprite: "Opium.png",          // Image: green pod
       Icon: "Opium_icon.png"
    },
    Bleach: {                        // Source: merchants, enemy NPCs
       Name: "Bleach",
-      Type: "material",             // Combines with "Opium"
+      Type: "Material",             
+      Description: "Combines with Opium",
       Amount: 1,
       Sprite: "Bleach.png",         // Image: brown bottle
       Icon: "Bleach_icon.png"
    },
-   Vitae: {                         // Combines with "Soma"
+   Vitae: {                         // Source: vampires
       Name: "Vitae",
-      Type: "material",             // Source: vampires
+      Type: "Material",             
+      Description: " Combines with Soma",
       Amount: 1,
       Sprite: "Vitae.png",          // Image: red vial
       Icon: "Vitae_icon.png"
    },
-   Soma: {                          // Combines with "Vitae" 
+   Soma: {                          // Source: insects
       Name: "Soma",
-      Type: "material",             // Source: insects
+      Type: "Material",
+      Description: "Combines with Vitae",
       Amount: 1,
       Sprite: "Soma.png",           // Image: yellow jar
       Icon: "Soma_icon.png"
    },
    "Charger (full)": {                  // Result of Craft("Hydrocell", "Antenna")
       Name: "Charger (full)",
-      Type: "parts",                // Restores SP
+      Type: "Parts",
+      Description: "Restores 10 SP",
       Effect: 10,
       Amount: 1,
       Sprite: "Charger.png",        // Image: green box (black wires)
@@ -154,7 +177,8 @@ Props = {                        // Usable and equippable items
    },
    "Morphine (full)": {                 // Result of Craft("Opium", "Bleach")
       Name: "Morphine (full)",
-      Type: "meds",                 // Restores HP
+      Type: "Meds",  
+      Description: "Restores 10 HP",
       Effect: 10,
       Amount: 1,
       Sprite: "Morphine.png",       // Image: orange vial (white label)
@@ -162,7 +186,8 @@ Props = {                        // Usable and equippable items
    },
    "Fetch (full)": {                    // Result of Craft("Vitae", "Soma")
       Name: "Fetch (full)",         // Street version of the "Mead of Poetry"
-      Type: "drugs",                // Restores MP
+      Type: "Drugs",
+      Description: "Restores 5 MP",
       Effect: 5,
       Amount: 1,
       Sprite: "Fetch.png",          // Image: purple jar (grey cap) 
@@ -170,7 +195,8 @@ Props = {                        // Usable and equippable items
    },
    "Charger (half)": {
       Name: "Charger (half)",
-      Type: "parts",
+      Type: "Parts",
+      Description: "Restores 5 SP",
       Effect: 5,
       Amount: 1,
       Sprite: "Charger_Half.png",
@@ -178,7 +204,8 @@ Props = {                        // Usable and equippable items
    },
    "Morphine (half)": {
       Name: "Morphine (half)",
-      Type: "meds",
+      Type: "Meds",
+      Description: "Restores 5 HP",
       Effect: 5,
       Amount: 1,
       Sprite: "Morphine_Half.png",
@@ -186,7 +213,8 @@ Props = {                        // Usable and equippable items
    },
    "Fetch (half)": {
       Name: "Fetch (half)",
-      Type: "drugs",
+      Type: "Drugs",
+      Description: "Restores 5 MP",
       Effect: 5,
       Amount: 1,
       Sprite: "Fetch_Half.png",
@@ -195,7 +223,8 @@ Props = {                        // Usable and equippable items
    // Food
    Apple: {
       Name: "Apple",
-      Type: "food",
+      Type: "Food",
+      Description: "Restores 1 HP",
       Effect: 1,
       Amount: 1,
       Sprite: "Apple.png",
@@ -204,11 +233,11 @@ Props = {                        // Usable and equippable items
 };
 
 //var Player = new Character(0, "Player", "European", "Guard", 1, {});
-var Player = JSON.parse('{"ID":0,"Name":"Player","Race":"European","Class":"Guard","Level":1,"EXP":0,"Status":"idle","Mood":0,"Angle":0,"Y_pos":0,"X_pos":0,"Quests":{},"Items":{},"Weapon":{},"Armor":{},"Deck":{},"Chip":{},"STR":12,"DEX":13,"STM":16,"INT":14,"WIT":14,"CHA":14,"WIL":11,"INS":13,"HUM":13,"HP_min":13,"SP_min":18,"MP_min":13,"HP":17,"SP":16,"MP":14}');
+var Player = JSON.parse('{"ID":0,"Name":"Yeager","Race":"European","Class":"Guard","Level":1,"EXP":0,"Status":"idle","Mood":0,"Angle":0,"Y_pos":0,"X_pos":0,"Quests":{},"Items":{},"Weapon":{},"Armor":{},"Deck":{},"Chip":{},"STR":12,"DEX":13,"STM":16,"INT":14,"WIT":14,"CHA":14,"WIL":11,"INS":13,"HUM":13,"HP_min":13,"SP_min":18,"MP_min":13,"HP":17,"SP":16,"MP":14}');
 Player.Chip = Player.Deck = Props["Empty"];
 Player.Weapon = Player.Items.Knife = Props["Knife"];
 Player.Armor = Player.Items["Street Clothes"] = Props["Street Clothes"];
-Player.Abilities = { Name: "Defense", Caption: "Increase your DEX and reduce enemy STR by 1d10 for 30s" }
+Player.Abilities = { Name: "Defense", Caption: "Increase your DEX by 1d10 and reduce enemy STR by 1d10 for 30s" }
 Player.__proto__ = Character.prototype;
 
 var Enemy = new Character(2, "Enemy", "Asian", "Soldier", 1, {});
@@ -221,16 +250,16 @@ Cast = {                            // Player and NPC objects
 Bill = {                        // Menu reference lists - call values in engine
    Character: {
       Info: {
-         Name: Player.Name, Race: Player.Race, Class: Player.Class, Level: Player.Level, EXP: Player.EXP,
+         Name: Player.Name, Level: Player.Level, Race: Player.Race, Class: Player.Class, EXP: Player.EXP, 
          HP: Player.HP, SP: Player.SP, MP: Player.MP, HP_max: Player.HP_max(), SP_max: Player.SP_max(), MP_max: Player.MP_max(),
          Weapon: Player.Weapon.Name, Armor: Player.Armor.Name, Deck: Player.Deck.Name, Chip: Player.Chip.Name
       },
       Stats: {
-         STR: Player.STR, DEX: Player.DEX, STM: Player.STM,
-         INT: Player.INT, WIT: Player.WIT, CHA: Player.CHA,
-         WIL: Player.WIL, INS: Player.INS, HUM: Player.HUM,
-         ATK: Player.ATK, DMG: Player.DMG, DEF: Player.DEF, EVD: Player.EVD,
-         CPU: Player.CPU, SEC: Player.SEC, HAX: Player.HAX,
+         Strength: Player.STR, Dexterity: Player.DEX, Stamina: Player.STM,
+         Intelligence: Player.INT, Wits: Player.WIT, Charisma: Player.CHA,
+         Willpower: Player.WIL, Insight: Player.INS, Humanity: Player.HUM,
+         Attack: Player.ATK(), Damage: Player.DMG(), Defense: Player.DEF(), Evade: Player.EVD(),
+         Speed: Player.CPU(), Cipher: Player.SEC(), Hack: Player.HAX(),
       },
       Skills: {
          Firearms: Player.Firearms(), Athletics: Player.Athletics(), Melee: Player.Melee(), Dodge: Player.Dodge(),

@@ -236,18 +236,18 @@ Character.prototype.Intuition = function () {
 // Abilities
 Character.prototype.Abilities_cls = function () {
    switch (this.Class) {
-      case "Soldier": return { Name: "Vengeance", Caption: "Increase your STR and reduce enemy DEX by 1d10 for 30s" };
-      case "Guard": return { Name: "Defense", Caption: "Increase your DEX and reduce enemy STR by 1d10 for 30s" };
-      case "Hacker": return { Name: "Celerity", Caption: "Increase your DEX and reduce enemy WIL by 1d10 for 30s" };
-      case "Thief": return { Name: "Obfuscate", Caption: "Increase your WIL and reduce enemy DEX by 1d10 for 30s" };
-      case "Tech": return { Name: "Redemption", Caption: "Increase your STM and reduce enemy WIT by 1d10 for 30s" };
-      case "Medic": return { Name: "Martyrdom", Caption: "Increase your WIT and reduce enemy STM by 1d10 for 30s" };
-      case "Scholar": return { Name: "Visionary", Caption: "Increase your INS and reduce enemy WIT by 1d10 for 30s" };
-      case "Artisan": return { Name: "Innocence", Caption: "Increase your WIT and reduce enemy INS by 1d10 for 30s" };
-      case "Trader": return { Name: "Auspex", Caption: "Increase your INT and reduce enemy CHA by 1d10 for 30s" };
-      case "Dealer": return { Name: "Dominate", Caption: "Increase your CHA and reduce enemy INT by 1d10 for 30s" };
-      case "Agent": return { Name: "Presence", Caption: "Increase your CHA and reduce enemy HUM by 1d10 for 30s" };
-      case "Officer": return { Name: "Judgement", Caption: "Increase your HUM and reduce enemy CHA by 1d10 for 30s" };
+      case "Soldier": return { Name: "Vengeance", Caption: "Increase your STR by 1d10 and reduce enemy DEX by 1d10 for 30s" };
+      case "Guard": return { Name: "Defense", Caption: "Increase your DEX by 1d10 and reduce enemy STR by 1d10 for 30s" };
+      case "Hacker": return { Name: "Celerity", Caption: "Increase your DEX by 1d10 and reduce enemy WIL by 1d10 for 30s" };
+      case "Thief": return { Name: "Obfuscate", Caption: "Increase your WIL by 1d10 and reduce enemy DEX by 1d10 for 30s" };
+      case "Tech": return { Name: "Redemption", Caption: "Increase your STM by 1d10 and reduce enemy WIT by 1d10 for 30s" };
+      case "Medic": return { Name: "Martyrdom", Caption: "Increase your WIT by 1d10 and reduce enemy STM by 1d10 for 30s" };
+      case "Scholar": return { Name: "Visionary", Caption: "Increase your INS by 1d10 and reduce enemy WIT by 1d10 for 30s" };
+      case "Artisan": return { Name: "Innocence", Caption: "Increase your WIT by 1d10 and reduce enemy INS by 1d10 for 30s" };
+      case "Trader": return { Name: "Auspex", Caption: "Increase your INT by 1d10 and reduce enemy CHA by 1d10 for 30s" };
+      case "Dealer": return { Name: "Dominate", Caption: "Increase your CHA by 1d10 and reduce enemy INT by 1d10 for 30s" };
+      case "Agent": return { Name: "Presence", Caption: "Increase your CHA by 1d10 and reduce enemy HUM by 1d10 for 30s" };
+      case "Officer": return { Name: "Judgement", Caption: "Increase your by 1d10 HUM and reduce enemy CHA by 1d10 for 30s" };
    }
 }
 
