@@ -1,5 +1,5 @@
 ﻿{
-	"version": 1629157489,
+	"version": 1629390428,
 	"fileList": [
 		"data.js",
 		"c2runtime.js",
@@ -40,9 +40,7 @@
 		"icon-128.png",
 		"icon-256.png",
 		"loading-logo.png",
-		"constructors.js",
-		"objects.js",
-		"functions.js",
+		"code.js",
 		"tree.scon",
 		"player.scon",
 		"enemy.scon",
