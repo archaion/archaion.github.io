@@ -908,7 +908,7 @@ Lines = {                        // NPC dialogue - see GetLines()
       3: {                                               // Accept quest = set INSTANCE variable
          NPC: "Very good. And be quick about it, I don't have all day.",
          Text: "1. Yes, sir. ( Leave )",
-         Update: "Mission accepted. ( Press F3 to view )", // Display in-game message
+         Update: "Mission accepted.\n( Press F3 to view )", // Display in-game message
          1: "END",
          Quest: "A0",                                    // Set to NPCs.Topic variable - "END" topic only
          Script: function () {
