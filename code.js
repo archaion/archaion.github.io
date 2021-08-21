@@ -890,9 +890,9 @@ Lines = {                        // NPC dialogue - see GetLines()
       0: {                                               // Topic ID
          NPC: "Yes? What do you want?",
          Text: "1. Who are you? \n2. Nothing. ( Leave )",  // User input prompts, with newline before each
-         1: "1",                                         // Key = user input, value = next topic
-         2: "END",                                       // "END" value exits "talk" state
-         Quest: "0"                                      // Reset dialogue
+         1: "1",                                           // Key = user input, value = next topic
+         2: "END",                                         // "END" value exits "talk" state
+         Quest: 0                                          // Reset dialogue
       },
       1: {
          NPC: "The name's Goldman. I own this place.",
@@ -900,10 +900,22 @@ Lines = {                        // NPC dialogue - see GetLines()
          1: "2",
       },
       2: {
-         NPC: "As a matter of fact, I do. Get me some apples from that tree over there and I'll pay you a dollar.",
-         Text: "1. Okay, I'll be right back with your apples Mr. Goldman.\n2. No, get them yourself.",
-         1: "3",
-         2: "4",
+         Path1: {
+            NPC: "As a matter of fact, I do. Get me some apples from that tree over there and I'll pay you a dollar.",
+            Text: "1. Okay, I'll be right back with your apples Mr. Goldman.\n2. No, get them yourself.",
+            1: "3",
+            2: "4"
+         },
+         Path2: {
+            Mute: "yes",
+            NPC: "*Goldman ignores you.*",
+            Text: "1. ( Leave )",
+            1: "END",
+            Quest: 0
+         },
+         Script: function () {
+            return Player.Quests.Goldman ? "Path2" : "Path1";  // Display Text1 or Text2 in engine
+         },
       },
       3: {                                               // Accept quest = set INSTANCE variable
          NPC: "Very good. And be quick about it, I don't have all day.",
@@ -912,7 +924,7 @@ Lines = {                        // NPC dialogue - see GetLines()
          1: "END",
          Quest: "A0",                                    // Set to NPCs.Topic variable - "END" topic only
          Script: function () {
-            return Player.Quests["Goldman"] = { A0: "Current status: \n\nFetching some apples for Goldman." };    // Key = NPC ID, value = description !!!!!!!!!
+            return Player.Quests.Goldman = { A0: "Current status: \n\nFetching some apples for Goldman." };    // Key = NPC ID, value = description !!!!!!!!!
          }
       },
       4: {
@@ -956,7 +968,7 @@ Lines = {                        // NPC dialogue - see GetLines()
          1: "END",
          Quest: 0,                                       // End quest & reset dialogue
          Script: function () {
-            Player.Quests["Goldman"] = { A0: "Current status: \n\nYour payment is counterfeit. Kill Goldman and take his money."} // Script NPC to attack
+            Player.Quests.Goldman = { A0: "Current status: \n\nYour payment is counterfeit. Kill Goldman and take his money."} // Script NPC to attack
             Trade(0, "remove", 1, "Apple");
             return "reward"
          }
