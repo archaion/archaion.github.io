@@ -924,7 +924,7 @@ Lines = {                        // NPC dialogue - see GetLines()
          1: "END",
          Quest: "A0",                                    // Set to NPCs.Topic variable - "END" topic only
          Script: function () {
-            return Player.Quests.Goldman = { A0: "Current status: \n\nFetching some apples for Goldman." };    // Key = NPC ID, value = description !!!!!!!!!
+            return Player.Quests.Goldman = { A0: "Fetching some apples for Goldman." };    // Key = NPC ID, value = description !!!!!!!!!
          }
       },
       4: {
@@ -968,7 +968,7 @@ Lines = {                        // NPC dialogue - see GetLines()
          1: "END",
          Quest: 0,                                       // End quest & reset dialogue
          Script: function () {
-            Player.Quests.Goldman = { A0: "Current status: \n\nYour payment is counterfeit. Kill Goldman and take his money."} // Script NPC to attack
+            Player.Quests.Goldman = { A0: "Your payment is counterfeit. Kill Goldman and take his money."} // Script NPC to attack
             Trade(0, "remove", 1, "Apple");
             return "reward"
          }
